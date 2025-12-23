@@ -1,0 +1,28 @@
+cabal-version:      3.0
+name:               lambda-calculus
+version:            0.1.0.0
+build-type:         Simple
+-- extra-source-files:
+
+common cm
+    ghc-options: -Wall
+    default-language: Haskell2010
+
+library
+    import:           cm
+    exposed-modules:  Lambda
+    -- other-modules:
+    -- other-extensions:
+    build-depends:    base ^>=4.20.2.0
+    hs-source-dirs:   src
+
+executable lambda-calculus
+    import:           cm
+    main-is:          Main.hs
+    -- other-modules:
+    -- other-extensions:
+    build-depends:
+        base ^>=4.20.2.0,
+        lambda-calculus
+
+    hs-source-dirs:   app
