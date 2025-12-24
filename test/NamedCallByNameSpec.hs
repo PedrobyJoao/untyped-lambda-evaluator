@@ -3,6 +3,8 @@ module NamedCallByNameSpec where
 import           Named
 import           Test.Hspec
 
+--- TODO: remove general cases that is already tested
+--- in the general eval testing of all strategies
 spec :: Spec
 spec = do
   describe "eval (call by name)" $ do
@@ -43,12 +45,18 @@ spec = do
           expr = Lam x inner
       eval CallByName expr `shouldBe` expr
 
-    it "does not evaluate arguments before application" $ do
-      -- (λx.λy.y) ((λx.x)(λx.x)) → λy.y
-      -- The argument is never needed, so it's not evaluated
-      let omega = App identity identity
-          expr = App (Lam x (Lam y (Var y))) omega
-      eval CallByName expr `shouldBe` Lam y (Var y)
+    it "does not evaluate arguments when applying to a func" $ do
+      -- (λx.λy. x y) ((λz.z) a)
+      -- The argument ((λz.z) a) is substituted for x, giving:
+      -- λy. ((λz.z) a) y
+      -- Call by name does not reduce under lambda nor args under application,
+      -- thus:
+      let a = MkVar "a"
+          arg = App (Lam z (Var z)) (Var a)  -- (λz.z) a — a redex
+          func = Lam x (Lam y (App (Var x) (Var y)))  -- λx.λy. x y
+          expr = App func arg
+          expected = Lam y (App arg (Var y))  -- λy. ((λz.z) a) y — arg still unevaluated
+      eval CallByName expr `shouldBe` expected
 
     it "handles nested applications" $ do
       -- ((λx.x) (λy.y)) z → z
