@@ -34,18 +34,16 @@ reduce (App e1 e2) = case e1 of
   Lam v e -> Just $ substitute v e e2
 
 -- body[bounded := free]
--- Variable capture:
--- (λy. x)[x := y] should become (λz. y), not (λy. y)
 substitute :: Var -> Expr -> Expr -> Expr
 substitute bounded body free = case body of
   (Var v)     -> if bounded == v then free else body
   (App e1 e2) -> App (substitute bounded e1 free) (substitute bounded e2 free)
   (Lam v e)   ->
     if bounded == v
-      then Lam v e -- bounded variable changed, don't try to substitute
+      then Lam v e -- different scope for the same var name, don't try to substitute
       else
         if appearsFreeIn v free && appearsFreeIn bounded e
-          then Lam v (substitute bounded (alphaRename e) free)
+          then substitute bounded (alphaRename body) free
           else Lam v (substitute bounded e free)
 
 -- * Variable Capture *
@@ -73,18 +71,17 @@ substitute bounded body free = case body of
 -- 2. There are occurrencens of `x` in the body at all. Otherwise, we don't need to
 -- rename anything if nothing will be replaced.
 alphaRename :: Expr -> Expr
-alphaRename (Lam var expr) = Lam newVar (go var newVar expr)
+alphaRename (Lam var expr) = Lam (newVar var) (go var (newVar var) expr)
   where
     go :: Var -> Var -> Expr -> Expr
     go old new e = case e of
       (Var v)     -> if v == old then Var new else e
       (App e1 e2) -> App (go old new e1) (go old new e2)
-      (Lam v le)  -> if old == v then Lam v le else Lam v (go old new le)
+      (Lam v le)  -> if old == v
+                       then Lam v le -- new scope for `v`, just ignore
+                       else Lam v (go old new le)
 
-    -- newName (MkVar v) e = if containsVar e (MkVar v) then newName new else new
-    --   where new = MkVar (v ++ "'")
-
-    newVar = MkVar "a"
+    newVar (MkVar v) = MkVar (v ++ "'")
 alphaRename a         = a
 
 appearsFreeIn :: Var -> Expr -> Bool
