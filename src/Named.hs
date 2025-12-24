@@ -14,26 +14,36 @@ data Expr = Var Var | App Expr Expr | Lam Var Expr
 newtype Var = MkVar String
   deriving (Show, Eq)
 
-eval :: Expr -> Expr
-eval e = case reduce e of
-  Nothing        -> e
-  (Just reduced) -> eval reduced
+data BetaReduction = Applicative | NormalOrder
+  | CallByName | CallByValue | CallByNeed
 
-{-|
- * Call by name *
+eval :: BetaReduction -> Expr -> Expr
+eval br expr = go expr
+  where go e = case reduce e of
+          Nothing   -> e
+          (Just e') -> go e'
+        reduce = reduceFn br
 
- It reduces only the leftmost outermost expression until
- it's a lambda, and then it applies the arguments without
- reducing them.
+reduceFn :: BetaReduction -> (Expr -> Maybe Expr)
+reduceFn CallByName = callByName
+reduceFn _          = nullReduction
 
- Expressions within the lambda term are not reduced.
--}
-reduce :: Expr -> Maybe Expr
-reduce (Var _)   = Nothing
-reduce (Lam _ _) = Nothing
-reduce (App e1 e2) = case e1 of
+nullReduction :: Expr -> Maybe Expr
+nullReduction _ = Nothing
+
+-- * Call by name *
+--
+-- It reduces only the leftmost outermost expression until
+-- it's a lambda, and then it applies the arguments without
+-- reducing them.
+--
+-- Expressions within the lambda term are not reduced.
+callByName :: Expr -> Maybe Expr
+callByName (Var _)   = Nothing
+callByName (Lam _ _) = Nothing
+callByName (App e1 e2) = case e1 of
   Var _   -> Nothing
-  App _ _ -> case reduce e1 of
+  App _ _ -> case callByName e1 of
     Nothing    -> Nothing
     (Just e1') -> Just (App e1' e2)
   Lam v e -> Just $ substitute v e e2
