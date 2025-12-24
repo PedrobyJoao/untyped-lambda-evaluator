@@ -19,9 +19,7 @@ data BetaReduction = Applicative | NormalOrder
 
 eval :: BetaReduction -> Expr -> Expr
 eval br expr = go expr
-  where go e = case reduce e of
-          Nothing   -> e
-          (Just e') -> go e'
+  where go e = maybe e go (reduce e)
         reduce = reduceFn br
 
 reduceFn :: BetaReduction -> (Expr -> Maybe Expr)
@@ -43,9 +41,7 @@ callByName (Var _)   = Nothing
 callByName (Lam _ _) = Nothing
 callByName (App e1 e2) = case e1 of
   Var _   -> Nothing
-  App _ _ -> case callByName e1 of
-    Nothing    -> Nothing
-    (Just e1') -> Just (App e1' e2)
+  App _ _ -> (\e1' -> App e1' e2) <$> callByName e1
   Lam v e -> Just $ substitute v e e2
 
 -- body[bounded := free]
