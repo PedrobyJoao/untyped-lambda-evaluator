@@ -50,6 +50,20 @@ spec = do
       -- The fresh variable should be different from y to avoid capture
       freshVar `shouldNotBe` y
 
+    it "avoids variable capture when naive renaming would still capture" $ do
+      -- (λy. (λy'. x))[x := y'] should become (λy. (λy''. y'))
+      -- The inner binder y' must be renamed because y' appears free in the replacement
+      -- The outer binder y does NOT need renaming (y is not free in y')
+      let y' = MkVar "y'"
+          y'' = MkVar "y''"
+          -- body: λy. (λy'. x)
+          body = Lam y (Lam y' (Var x))
+          -- free expression: y'
+          free = Var y'
+          result = substitute x body free
+      -- Should be: λy. (λy''. y')
+      result `shouldBe` Lam y (Lam y'' (Var y'))
+
   describe "alphaRename" $ do
     let x = MkVar "x"
         x' = MkVar "x'"

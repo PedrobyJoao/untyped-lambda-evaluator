@@ -34,19 +34,8 @@ reduce (App e1 e2) = case e1 of
   Lam v e -> Just $ substitute v e e2
 
 -- body[bounded := free]
-substitute :: Var -> Expr -> Expr -> Expr
-substitute bounded body free = case body of
-  (Var v)     -> if bounded == v then free else body
-  (App e1 e2) -> App (substitute bounded e1 free) (substitute bounded e2 free)
-  (Lam v e)   ->
-    if bounded == v
-      then Lam v e -- different scope for the same var name, don't try to substitute
-      else
-        if appearsFreeIn v free && appearsFreeIn bounded e
-          then substitute bounded (alphaRename body) free
-          else Lam v (substitute bounded e free)
-
--- * Variable Capture *
+--
+-- Note on: * Variable Capture *
 --
 -- Given a function application (λy.x)[x := y]:
 --
@@ -70,6 +59,19 @@ substitute bounded body free = case body of
 --
 -- 2. There are occurrencens of `x` in the body at all. Otherwise, we don't need to
 -- rename anything if nothing will be replaced.
+substitute :: Var -> Expr -> Expr -> Expr
+substitute bounded body free = case body of
+  (Var v)     -> if bounded == v then free else body
+  (App e1 e2) -> App (substitute bounded e1 free) (substitute bounded e2 free)
+  (Lam v e)   ->
+    if bounded == v
+      then Lam v e -- different scope for the same var name, don't try to substitute
+      else
+        if appearsFreeIn v free && appearsFreeIn bounded e
+          then substitute bounded (alphaRename body) free
+          else Lam v (substitute bounded e free)
+
+-- Given (λx.<expr>), rename all occurrences of `x`, including the bound var
 alphaRename :: Expr -> Expr
 alphaRename (Lam var expr) = Lam (newVar var) (go var (newVar var) expr)
   where
