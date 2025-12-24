@@ -63,27 +63,24 @@ substitute :: Var -> Expr -> Expr -> Expr
 substitute bounded body free = case body of
   (Var v)     -> if bounded == v then free else body
   (App e1 e2) -> App (substitute bounded e1 free) (substitute bounded e2 free)
-  (Lam v e)   ->
-    if bounded == v
-      then Lam v e -- different scope for the same var name, don't try to substitute
-      else
-        if appearsFreeIn v free && appearsFreeIn bounded e
-          then substitute bounded (alphaRename body) free
-          else Lam v (substitute bounded e free)
+  (Lam v e)
+    | bounded == v -> Lam v e -- different scope for the same var name, don't try to substitute
+    | appearsFreeIn v free && appearsFreeIn bounded e -> substitute bounded (alphaRename body) free
+    | otherwise -> Lam v (substitute bounded e free)
 
 -- Given (λx.<expr>), rename all occurrences of `x`, including the bound var
 alphaRename :: Expr -> Expr
-alphaRename (Lam var expr) = Lam (newVar var) (go var (newVar var) expr)
+alphaRename (Lam var expr) = Lam newV (go var newV expr)
   where
-    go :: Var -> Var -> Expr -> Expr
+    newV = newVar var
     go old new e = case e of
       (Var v)     -> if v == old then Var new else e
       (App e1 e2) -> App (go old new e1) (go old new e2)
       (Lam v le)  -> if old == v
                        then Lam v le -- new scope for `v`, just ignore
                        else Lam v (go old new le)
-
     newVar (MkVar v) = MkVar (v ++ "'")
+-- func should only be used with abstractions, should we use Either or Maybe?
 alphaRename a         = a
 
 appearsFreeIn :: Var -> Expr -> Bool
