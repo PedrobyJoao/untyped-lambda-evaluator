@@ -1,4 +1,4 @@
-module Lambda where
+module Named where
 
 {-|
 
@@ -85,7 +85,7 @@ alphaRename (Lam var expr) = Lam newV (go var newV expr)
                        then Lam v le -- new scope for `v`, just ignore
                        else Lam v (go old new le)
     newVar (MkVar v) = MkVar (v ++ "'")
--- TODO: func should only be used with abstractions, should we use Either or Maybe?
+-- todo-minor: func should only be used with abstractions, should we use Either or Maybe?
 alphaRename a         = a
 
 isFreeIn :: Var -> Expr -> Bool

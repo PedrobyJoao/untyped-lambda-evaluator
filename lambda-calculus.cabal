@@ -10,7 +10,7 @@ common cm
 
 library
     import:           cm
-    exposed-modules:  Lambda
+    exposed-modules:  Named
     -- other-modules:
     -- other-extensions:
     build-depends:    base ^>=4.20.2.0
@@ -31,7 +31,7 @@ test-suite lambda-calculus-test
     import:           cm
     type:             exitcode-stdio-1.0
     main-is:          Spec.hs
-    other-modules:    LambdaSpec
+    other-modules:    NamedSpec
     hs-source-dirs:   test
     build-depends:
         base ^>=4.20.2.0,

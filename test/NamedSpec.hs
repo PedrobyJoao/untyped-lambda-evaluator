@@ -1,6 +1,6 @@
-module LambdaSpec where
+module NamedSpec where
 
-import           Lambda
+import           Named
 import           Test.Hspec
 
 spec :: Spec
