@@ -14,6 +14,11 @@ data Expr = Var Var | App Expr Expr | Lam Var Expr
 newtype Var = MkVar String
   deriving (Show, Eq)
 
+eval :: Expr -> Expr
+eval e = case reduce e of
+  Nothing        -> e
+  (Just reduced) -> eval reduced
+
 {-|
  * Call by name *
 
@@ -65,7 +70,7 @@ substitute bounded body free = case body of
   (App e1 e2) -> App (substitute bounded e1 free) (substitute bounded e2 free)
   (Lam v e)
     | bounded == v -> Lam v e -- different scope for the same var name, don't try to substitute
-    | appearsFreeIn v free && appearsFreeIn bounded e -> substitute bounded (alphaRename body) free
+    | isFreeIn v free && isFreeIn bounded e -> substitute bounded (alphaRename body) free
     | otherwise -> Lam v (substitute bounded e free)
 
 -- Given (λx.<expr>), rename all occurrences of `x`, including the bound var
@@ -80,17 +85,12 @@ alphaRename (Lam var expr) = Lam newV (go var newV expr)
                        then Lam v le -- new scope for `v`, just ignore
                        else Lam v (go old new le)
     newVar (MkVar v) = MkVar (v ++ "'")
--- func should only be used with abstractions, should we use Either or Maybe?
+-- TODO: func should only be used with abstractions, should we use Either or Maybe?
 alphaRename a         = a
 
-appearsFreeIn :: Var -> Expr -> Bool
-appearsFreeIn binder expr = case expr of
+isFreeIn :: Var -> Expr -> Bool
+isFreeIn binder expr = case expr of
   (Var v) -> binder == v
-  (App e1 e2) -> appearsFreeIn binder e1 || appearsFreeIn binder e2
+  (App e1 e2) -> isFreeIn binder e1 || isFreeIn binder e2
   (Lam innerBinder e) -> if innerBinder == binder then False
-                           else appearsFreeIn binder e
-
-eval :: Expr -> Expr
-eval e = case reduce e of
-  Nothing        -> e
-  (Just reduced) -> eval reduced
+                           else isFreeIn binder e

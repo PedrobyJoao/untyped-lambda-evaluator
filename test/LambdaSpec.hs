@@ -101,35 +101,35 @@ spec = do
       alphaRename (Lam x (Lam y (App (Var x) (Var y))))
         `shouldBe` Lam x' (Lam y (App (Var x') (Var y)))
 
-  describe "appearsFreeIn" $ do
+  describe "isFreeIn" $ do
     let x = MkVar "x"
         y = MkVar "y"
         z = MkVar "z"
 
     it "returns True for a matching variable" $ do
-      appearsFreeIn x (Var x) `shouldBe` True
+      isFreeIn x (Var x) `shouldBe` True
 
     it "returns False for a non-matching variable" $ do
-      appearsFreeIn x (Var y) `shouldBe` False
+      isFreeIn x (Var y) `shouldBe` False
 
     it "returns True when variable appears free in left side of application" $ do
-      appearsFreeIn x (App (Var x) (Var y)) `shouldBe` True
+      isFreeIn x (App (Var x) (Var y)) `shouldBe` True
 
     it "returns True when variable appears free in right side of application" $ do
-      appearsFreeIn x (App (Var y) (Var x)) `shouldBe` True
+      isFreeIn x (App (Var y) (Var x)) `shouldBe` True
 
     it "returns False when variable does not appear in application" $ do
-      appearsFreeIn x (App (Var y) (Var z)) `shouldBe` False
+      isFreeIn x (App (Var y) (Var z)) `shouldBe` False
 
     it "returns False when variable is bound by lambda" $ do
-      appearsFreeIn x (Lam x (Var x)) `shouldBe` False
+      isFreeIn x (Lam x (Var x)) `shouldBe` False
 
     it "returns True when variable appears free under a different binder" $ do
-      appearsFreeIn x (Lam y (Var x)) `shouldBe` True
+      isFreeIn x (Lam y (Var x)) `shouldBe` True
 
     it "returns False when variable is shadowed by inner lambda" $ do
-      appearsFreeIn x (Lam y (Lam x (Var x))) `shouldBe` False
+      isFreeIn x (Lam y (Lam x (Var x))) `shouldBe` False
 
     it "returns True when free in complex nested expression" $ do
       -- λy. (λz. x z) — x is free
-      appearsFreeIn x (Lam y (Lam z (App (Var x) (Var z)))) `shouldBe` True
+      isFreeIn x (Lam y (Lam z (App (Var x) (Var z)))) `shouldBe` True
