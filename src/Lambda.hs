@@ -88,7 +88,7 @@ alphaRename a         = a
 
 appearsFreeIn :: Var -> Expr -> Bool
 appearsFreeIn binder expr = case expr of
-  (Var v) -> if binder == v then True else False
+  (Var v) -> binder == v
   (App e1 e2) -> appearsFreeIn binder e1 || appearsFreeIn binder e2
   (Lam innerBinder e) -> if innerBinder == binder then False
                            else appearsFreeIn binder e
