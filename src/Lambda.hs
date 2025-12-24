@@ -9,7 +9,7 @@ Roadmap:
 -}
 
 data Expr = Var Var | App Expr Expr | Lam Var Expr
-  deriving (Show)
+  deriving (Show, Eq)
 
 newtype Var = MkVar String
   deriving (Show, Eq)
@@ -33,13 +33,66 @@ reduce (App e1 e2) = case e1 of
     (Just e1') -> Just (App e1' e2)
   Lam v e -> Just $ substitute v e e2
 
+-- body[bounded := free]
+-- Variable capture:
+-- (λy. x)[x := y] should become (λz. y), not (λy. y)
 substitute :: Var -> Expr -> Expr -> Expr
 substitute bounded body free = case body of
   (Var v)     -> if bounded == v then free else body
   (App e1 e2) -> App (substitute bounded e1 free) (substitute bounded e2 free)
-  (Lam v e)   -> if bounded == v
-                   then Lam v e
-                   else Lam v (substitute bounded e free)
+  (Lam v e)   ->
+    if bounded == v
+      then Lam v e -- bounded variable changed, don't try to substitute
+      else
+        if appearsFreeIn v free && appearsFreeIn bounded e
+          then Lam v (substitute bounded (alphaRename e) free)
+          else Lam v (substitute bounded e free)
+
+-- * Variable Capture *
+--
+-- Given a function application (λy.x)[x := y]:
+--
+-- To avoid Variable Capture we must rename the bound variable
+-- so that the new replacement doesn't represent something that
+-- was not intended. Afterall, if the bound variable originally
+-- does not have any occurrences of bounded variables, it is not
+-- valid to simply insert (by a reduction) a new bound variable
+-- to the expression.
+--
+-- (λy.x)[x := y] -> (λy.y) would be wrong because now the second `y`
+-- , which came from a function application, is artificially bounded
+-- to the bound variable. That is invalid.
+--
+-- (λy.x)[x := y] -> (λy'.y) would be the correct format.
+--
+-- We should rename if:
+--
+-- 1. The *bound variable* appears FREE in the replacement (reminder: in [x := y],
+-- `y` can be a complex expression rather than just a variable).
+--
+-- 2. There are occurrencens of `x` in the body at all. Otherwise, we don't need to
+-- rename anything if nothing will be replaced.
+alphaRename :: Expr -> Expr
+alphaRename (Lam var expr) = Lam newVar (go var newVar expr)
+  where
+    go :: Var -> Var -> Expr -> Expr
+    go old new e = case e of
+      (Var v)     -> if v == old then Var new else e
+      (App e1 e2) -> App (go old new e1) (go old new e2)
+      (Lam v le)  -> if old == v then Lam v le else Lam v (go old new le)
+
+    -- newName (MkVar v) e = if containsVar e (MkVar v) then newName new else new
+    --   where new = MkVar (v ++ "'")
+
+    newVar = MkVar "a"
+alphaRename a         = a
+
+appearsFreeIn :: Var -> Expr -> Bool
+appearsFreeIn binder expr = case expr of
+  (Var v) -> if binder == v then True else False
+  (App e1 e2) -> appearsFreeIn binder e1 || appearsFreeIn binder e2
+  (Lam innerBinder e) -> if innerBinder == binder then False
+                           else appearsFreeIn binder e
 
 eval :: Expr -> Expr
 eval e = case reduce e of

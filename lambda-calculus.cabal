@@ -26,3 +26,16 @@ executable lambda-calculus
         lambda-calculus
 
     hs-source-dirs:   app
+
+test-suite lambda-calculus-test
+    import:           cm
+    type:             exitcode-stdio-1.0
+    main-is:          Spec.hs
+    other-modules:    LambdaSpec
+    hs-source-dirs:   test
+    build-depends:
+        base ^>=4.20.2.0,
+        hspec,
+        hspec-discover,
+        lambda-calculus
+    build-tool-depends: hspec-discover:hspec-discover
