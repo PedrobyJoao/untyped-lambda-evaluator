@@ -116,7 +116,7 @@ spec = do
         (App (Var x) (Var y))
         (App (Var x) (Var y))
 
-  describe "Applicative: Single-step reduction order" $ do
+  describe "Full beta reduction: Single-step reduction order" $ do
 
     describe "Applicative Order (rightmost innermost first)" $ do
       -- (λx.x b) ((λy.y) a)

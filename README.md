@@ -1,1 +1,3 @@
-#
+- [x] Alpha-renaming
+- [ ] Beta-reductions: Call by name, call by value, applicative and normal order
+- [ ] HOAS
