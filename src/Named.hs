@@ -1,14 +1,12 @@
 module Named where
 
-
 data Expr = Var Var | App Expr Expr | Lam Var Expr
   deriving (Show, Eq)
 
 newtype Var = MkVar String
   deriving (Show, Eq)
 
-data BetaReduction = Applicative | NormalOrder
-  | CallByName | CallByValue
+data BetaReduction = Applicative | NormalOrder | CallByName
   deriving (Show, Eq)
 
 eval :: BetaReduction -> Expr -> Expr
@@ -20,10 +18,6 @@ reduceFn :: BetaReduction -> (Expr -> Maybe Expr)
 reduceFn CallByName  = callByName
 reduceFn Applicative = applicative
 reduceFn NormalOrder = normalOrder
-reduceFn _           = nullReduction -- TODO: return error instead
-
-nullReduction :: Expr -> Maybe Expr
-nullReduction _ = Nothing
 
 -- * Applicative *
 --
@@ -36,12 +30,6 @@ nullReduction _ = Nothing
 --
 -- `(\x.x b) ((\y.y) a)`
 -- 1 step: `(\x.x b) a`
---
--- (λx.(λy.y) x) a
--- case applicative a of
--- Nothing -> case e1 of
--- Lam v e -> substitute v innerReduce a
--- innerReduce = applicative (λy.y) x
 applicative :: Expr -> Maybe Expr
 applicative (Var _)   = Nothing
 applicative (Lam v e) = Lam v  <$> applicative e
