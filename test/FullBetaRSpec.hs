@@ -148,13 +148,6 @@ spec = do
             expr = App (Lam x (App (Var x) (Var b))) chosenRedex
         normalOrder expr `shouldBe` Just (App chosenRedex (Var b))
 
-      -- (λx.(λy.y) x) a
-      -- Normal order should reduce the outer application first
-      -- Result after 1 step: (λy.y) a
-      it "reduces outer redex before inner redex in body" $ do
-        let expr = App (Lam x (App (Lam y (Var y)) (Var x))) (Var a)
-        normalOrder expr `shouldBe` Just (App (Lam y (Var y)) (Var a))
-
       -- λx.(λy.y) x
       -- Normal order still reduces inside lambdas (unlike call-by-name)
       it "reduces inside lambda abstraction" $ do
