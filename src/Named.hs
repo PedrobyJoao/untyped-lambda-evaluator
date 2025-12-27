@@ -19,6 +19,7 @@ eval br expr = go expr
 reduceFn :: BetaReduction -> (Expr -> Maybe Expr)
 reduceFn CallByName  = callByName
 reduceFn Applicative = applicative
+reduceFn NormalOrder = normalOrder
 reduceFn _           = nullReduction -- TODO: return error instead
 
 nullReduction :: Expr -> Maybe Expr
@@ -49,13 +50,6 @@ applicative (App e1 e2)
   | Just e1' <- applicative e1 = Just $ App e1' e2
   | Lam v body <- e1 = Just $ substitute v body e2
   | otherwise = Nothing
--- my first ugly version:
--- applicative (App e1 e2) = case applicative e2 of
---   Nothing        -> case (applicative e1, e1) of
---     (Nothing, Lam v e) -> Just $ substitute v e e2
---     (Nothing, _)       -> Nothing
---     (Just e, _)        -> Just $ App e e2
---   Just e2Reduced -> Just $ App e1 e2Reduced
 
 -- * Normal Order *
 --
@@ -66,7 +60,13 @@ applicative (App e1 e2)
 -- `(\x.x b) ((\y.y) a)`
 -- 1 step: `((\y.y) a) b` ...
 normalOrder :: Expr -> Maybe Expr
-normalOrder _ = Nothing
+normalOrder (Var _)   = Nothing
+normalOrder (Lam v b) = Lam v <$> normalOrder b
+normalOrder (App e1 e2)
+  | Lam v b <- e1 = Just $ substitute v b e2
+  | Just e1' <- normalOrder e1 = Just $ App e1' e2
+  | Just e2' <- normalOrder e2 = Just $ App e1 e2'
+  | otherwise = Nothing
 
 -- * Call by name *
 --
