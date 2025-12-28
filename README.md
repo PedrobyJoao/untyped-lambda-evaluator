@@ -1,3 +1,5 @@
 - [x] Alpha-renaming
-- [ ] Beta-reductions: Call by name, call by value, applicative and normal order
-- [ ] HOAS
+- [x] Beta-reductions: Call by name, applicative, and normal order
+- [ ] Parser
+- [ ] IO: CLI, web? not sure yet
+- [ ] HOAS and de Bruijn index?
