@@ -10,10 +10,12 @@ common cm
 
 library
     import:           cm
-    exposed-modules:  Named
+    exposed-modules:  Named,
+                      Parser
     -- other-modules:
     -- other-extensions:
-    build-depends:    base ^>=4.20.2.0
+    build-depends:    base ^>=4.20.2.0,
+                      megaparsec
     hs-source-dirs:   src
 
 executable lambda-calculus
