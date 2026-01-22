@@ -27,17 +27,17 @@ import qualified Text.Megaparsec.Char.Lexer as L
 type Parser = Parsec Void String
 
 var :: Parser Var
-var =  do
+var =  label "variable" $ lexeme $ do
   first <- letterChar <|> char '_'
-  rest <- lexeme $ many alphaNumCharExtra
+  rest <- many alphaNumCharExtra
   return $ MkVar $ first : rest
     where alphaNumCharExtra = alphaNumChar <|> char '_'
 
 lamVar :: Parser Var
-lamVar = var <* symbol "."
+lamVar = label "lamVar" $ var <* symbol "."
 
 lam :: Parser Expr
-lam = do
+lam = label "lambda" $ do
   _ <- lambdaToken
   v <- lamVar
   body <- expr
@@ -46,7 +46,7 @@ lam = do
     lambdaToken = lexeme $ char '\\' <|> char 'λ'
 
 app :: Parser Expr
-app = do
+app = label "application" $ do
   exprs <- some atom
   case exprs of
     []     -> return (Var (MkVar "id"))
@@ -58,7 +58,6 @@ atom = fmap Var var <|> parens expr
 expr :: Parser Expr
 expr = try lam <|> try app
 
--- TODO: skip leading spaces
 parseExpr :: Parser Expr
 parseExpr = expr <* eof
 
