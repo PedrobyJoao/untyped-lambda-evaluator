@@ -6,7 +6,7 @@ import           Test.Hspec
 
 spec :: Spec
 spec = do
-  describe "Parser.parseStr" $ do
+  describe "Parser.Valid" $ do
     let x = MkVar "x"
         y = MkVar "y"
         z = MkVar "z"
@@ -63,6 +63,38 @@ spec = do
                   (App (Var g) (Var x)))
              (Var z))
 
+  describe "Parser.Lexeme" $ do
+    let x = MkVar "x"
+        a = MkVar "a"
+
+    it "accepts leading spaces at the beginning of the expression" $ do
+      expectParse "   x" (Var x)
+
+    it "accepts trailing spaces at the end of the expression" $ do
+      expectParse "x   " (Var x)
+
+    it "accepts spaces after \\\\ (lambda token), and also works without them" $ do
+      let expected = Lam x (Var x)
+      expectParse "\\x. x" expected
+      expectParse "\\ x. x" expected
+
+    it "accepts spaces after '.' and also works without spaces after '.'" $ do
+      let expected = (Lam x (Var x))
+      expectParse "\\x.x" expected
+      expectParse "\\x. x" expected
+
+    it "accepts spaces after '(' and also works without spaces after '('" $ do
+      let expected = Var x
+      expectParse "(x)" expected
+      expectParse "( x)" expected
+      expectParse "( x )" expected
+
+    it "accepts spaces in common parenthesized lambda application patterns" $ do
+      let expected = (App (Lam x (Var x)) (Var a))
+      expectParse "(\\x.x) a" expected
+      expectParse "( \\x. x ) a" expected
+
+  describe "Parser.Invalid" $ do
     it "rejects a lambda missing the dot" $ do
       expectFail "\\x x"
 
