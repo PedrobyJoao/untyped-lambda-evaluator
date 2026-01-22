@@ -37,6 +37,7 @@ test-suite lambda-calculus-test
         NamedSpec
         NamedCallByNameSpec
         FullBetaRSpec
+        ParserSpec
     hs-source-dirs:   test
     build-depends:
         base ^>=4.20.2.0,
