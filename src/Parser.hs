@@ -59,7 +59,7 @@ expr :: Parser Expr
 expr = try lam <|> try app
 
 parseExpr :: Parser Expr
-parseExpr = expr <* eof
+parseExpr = space *> expr <* eof
 
 parseStr :: String -> Either (ParseErrorBundle String Void) Expr
 parseStr = parse parseExpr ""
