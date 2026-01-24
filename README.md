@@ -1,5 +1,8 @@
+# WIP
+
 - [x] Alpha-renaming
 - [x] Beta-reductions: Call by name, applicative, and normal order
-- [ ] Parser
-- [ ] IO: CLI, web? not sure yet
+- [x] Parser
+- [ ] IO-Webpage
+- [ ] CI/CD with tests and build
 - [ ] HOAS and de Bruijn index?

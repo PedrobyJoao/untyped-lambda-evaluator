@@ -19,9 +19,7 @@ import qualified Text.Megaparsec.Char.Lexer as L
 -- lexemes, not higher level abstractions like `atom`.
 
 -- TODOs:
--- [ ] eleminate left-recursive parsing as it's incompatible with
--- the megaparsec topdown approach. Use atoms: var, lam and parenthesed
--- expr. And then an application is a chain of atoms
+-- [ ] Better error handling
 -- [ ] Handle multiple arguments syntax sugar (`\x  y. -> ...`)
 -- [ ] Use Text
 type Parser = Parsec Void String
