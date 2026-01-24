@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lambda Calculus Evaluator</title>
+
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css"
+    />
+  </head>
+
+  <body>
+    <main class="container">
+      <header>
+        <h1>Lambda Calculus</h1>
+        <p>Type an expression, choose a strategy, and evaluate.</p>
+      </header>
+
+      <section>
+        <form hx-post="/eval" hx-target="#output" hx-swap="innerHTML">
+          <label for="expr">Expression</label>
+          <textarea
+            id="expr"
+            name="expr"
+            rows="10"
+            placeholder="\x. x"
+            required
+          ></textarea>
+
+          <fieldset>
+            <legend>Strategy</legend>
+            <label>
+              <input type="radio" name="strategy" value="normal" checked />
+              Normal order
+            </label>
+            <label>
+              <input type="radio" name="strategy" value="cbn" />
+              Call-by-name
+            </label>
+            <label>
+              <input type="radio" name="strategy" value="applicative" />
+              Applicative order
+            </label>
+          </fieldset>
+
+          <button type="submit">Evaluate</button>
+        </form>
+      </section>
+
+      <section>
+        <h2>Output</h2>
+        <article id="output">
+          <em>No output yet.</em>
+        </article>
+      </section>
+    </main>
+
+    <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+  </body>
+</html>

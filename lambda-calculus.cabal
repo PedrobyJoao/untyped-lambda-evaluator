@@ -21,11 +21,16 @@ library
 executable lambda-calculus
     import:           cm
     main-is:          Main.hs
+    ghc-options: -threaded
     -- other-modules:
     -- other-extensions:
     build-depends:
         base ^>=4.20.2.0,
-        lambda-calculus
+        lambda-calculus,
+        scotty,
+        text,
+        wai,
+        wai-middleware-static
 
     hs-source-dirs:   app
 

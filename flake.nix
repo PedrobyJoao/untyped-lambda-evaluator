@@ -20,6 +20,7 @@
       rec {
         devShell = pkgs.mkShell {
           buildInputs = [
+            pkgs.zlib
             pkgs.haskellPackages.ghc
             pkgs.haskellPackages.haskell-language-server
             pkgs.haskellPackages.cabal-install
