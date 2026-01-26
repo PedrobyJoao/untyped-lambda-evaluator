@@ -25,16 +25,16 @@ main = scotty 3000 $ do
 
     case parseStrategy stratTxt of
       Left stratErr ->
-        html $ renderOutputOnly ("<pre>" <> escapeHtml stratErr <> "</pre>")
+        html $ renderOutputOnly stratErr
       Right strategy ->
         case parseStr (TL.unpack exprTxt) of
           Left parseErr ->
-            html $ renderOutputOnly ("<pre>" <> escapeHtml (TL.pack (errorBundlePretty parseErr)) <> "</pre>")
+            html $ renderOutputOnly (TL.pack (errorBundlePretty parseErr))
           Right parsedExpr -> do
             let result = eval strategy parsedExpr
             html $
               renderOutputAndStats
-                ("<pre>" <> escapeHtml (TL.pack (show result)) <> "</pre>")
+                (TL.pack (show result))
                 ("<em>No statistics yet.</em>")
 
 parseStrategy :: TL.Text -> Either TL.Text BetaReduction
@@ -51,29 +51,32 @@ staticUnderPrefix =
   noDots >-> isNotAbsolute >-> hasPrefix "static/"
 
 renderOutputOnly :: TL.Text -> TL.Text
-renderOutputOnly outputInner =
+renderOutputOnly outputText =
   mconcat
-    [ "<section>"
-    , "<h2>Output expression / Error</h2>"
-    , "<article id=\"output\">"
-    , "<div id=\"resultContent\">"
-    , outputInner
-    , "</div>"
-    , "</article>"
+    [ "<section id=\"outputSection\">"
+    , "<p class=\"result-label\">Output:</p>"
+    , "<pre class=\"result-pre\" id=\"outputPre\">"
+    , escapeHtml outputText
+    , "</pre>"
     , "</section>"
     ]
 
 renderOutputAndStats :: TL.Text -> TL.Text -> TL.Text
-renderOutputAndStats outputInner statsInner =
+renderOutputAndStats outputText statsInner =
   mconcat
-    [ renderOutputOnly outputInner
-    , "<section>"
-    , "<h2>Dropdown statistics</h2>"
-    , "<article id=\"stats\">"
+    [ "<section id=\"outputSection\">"
+    , "<p class=\"result-label\">Output:</p>"
+    , "<pre class=\"result-pre\" id=\"outputPre\">"
+    , escapeHtml outputText
+    , "</pre>"
+    , "</section>"
+    , "<section id=\"statsSection\">"
+    , "<p class=\"result-label\">Statistics:</p>"
+    , "<div class=\"result-box\" id=\"statsBox\">"
     , "<div id=\"statsContent\">"
-    , statsInner
+    , escapeHtml statsInner
     , "</div>"
-    , "</article>"
+    , "</div>"
     , "</section>"
     ]
 
