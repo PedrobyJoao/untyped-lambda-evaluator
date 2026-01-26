@@ -1,0 +1,504 @@
+/* Force light mode */
+html {
+  color-scheme: light;
+}
+
+/*
+ * Fresh colorful theme overrides for Pico v2
+ * Keep changes simple: gradient background + vibrant accent + softer cards.
+ */
+:root {
+  /* Accent palette */
+  --accent-1: #7c3aed; /* violet */
+  --accent-2: #06b6d4; /* cyan */
+  --accent-3: #f97316; /* orange (small highlights) */
+
+  /* Base */
+  --pico-background-color: #f6f7ff;
+
+  /* Text */
+  --pico-color: #0f172a;
+  --pico-h1-color: #0f172a;
+  --pico-h2-color: #0f172a;
+  --pico-h3-color: #0f172a;
+  --pico-h4-color: #0f172a;
+  --pico-h5-color: #0f172a;
+  --pico-h6-color: #0f172a;
+  --pico-muted-color: rgba(15, 23, 42, 0.65);
+  --pico-muted-border-color: rgba(15, 23, 42, 0.18);
+
+  /* Card / article */
+  --pico-card-background-color: rgba(255, 255, 255, 0.88);
+  --pico-card-border-color: rgba(15, 23, 42, 0.12);
+  --pico-card-sectioning-background-color: rgba(255, 255, 255, 0.7);
+
+  /* Form elements */
+  --pico-form-element-background-color: rgba(255, 255, 255, 0.92);
+  --pico-form-element-selected-background-color: rgba(255, 255, 255, 0.92);
+  --pico-form-element-border-color: rgba(15, 23, 42, 0.22);
+  --pico-form-element-color: #0f172a;
+  --pico-form-element-placeholder-color: rgba(15, 23, 42, 0.45);
+  --pico-form-element-active-background-color: #ffffff;
+  --pico-form-element-active-border-color: rgba(124, 58, 237, 0.65);
+  --pico-form-element-focus-color: rgba(124, 58, 237, 0.25);
+
+  /* Primary (buttons, links) */
+  --pico-primary: var(--accent-1);
+  --pico-primary-background: var(--accent-1);
+  --pico-primary-border: rgba(124, 58, 237, 0.75);
+  --pico-primary-underline: rgba(124, 58, 237, 0.55);
+  --pico-primary-hover: #6d28d9;
+  --pico-primary-hover-background: #6d28d9;
+  --pico-primary-hover-border: rgba(109, 40, 217, 0.85);
+  --pico-primary-focus: rgba(124, 58, 237, 0.25);
+  --pico-primary-inverse: #ffffff;
+
+  /* Secondary */
+  --pico-secondary: #0f172a;
+  --pico-secondary-background: rgba(255, 255, 255, 0.92);
+  --pico-secondary-border: rgba(15, 23, 42, 0.25);
+  --pico-secondary-hover: #0f172a;
+  --pico-secondary-hover-background: rgba(255, 255, 255, 1);
+  --pico-secondary-hover-border: rgba(15, 23, 42, 0.35);
+  --pico-secondary-focus: rgba(124, 58, 237, 0.18);
+  --pico-secondary-inverse: #ffffff;
+
+  /* Code */
+  --pico-code-background-color: rgba(124, 58, 237, 0.08);
+  --pico-code-color: #0f172a;
+
+  /* Table */
+  --pico-table-border-color: rgba(15, 23, 42, 0.12);
+
+  /* Blockquote */
+  --pico-blockquote-border-color: rgba(124, 58, 237, 0.35);
+  --pico-blockquote-footer-color: rgba(15, 23, 42, 0.65);
+
+  /* Mark */
+  --pico-mark-background-color: rgba(249, 115, 22, 0.22);
+  --pico-mark-color: #0f172a;
+
+  /* Dropdown */
+  --pico-dropdown-background-color: rgba(255, 255, 255, 0.96);
+  --pico-dropdown-border-color: rgba(15, 23, 42, 0.12);
+  --pico-dropdown-color: #0f172a;
+  --pico-dropdown-hover-background-color: rgba(124, 58, 237, 0.07);
+
+  /* Modal */
+  --pico-modal-overlay-background-color: rgba(15, 23, 42, 0.55);
+
+  /* Progress */
+  --pico-progress-background-color: rgba(15, 23, 42, 0.12);
+  --pico-progress-color: var(--accent-1);
+
+  /* Tooltip */
+  --pico-tooltip-background-color: #0b1220;
+  --pico-tooltip-color: #ffffff;
+
+  /* Switch */
+  --pico-switch-background-color: rgba(15, 23, 42, 0.2);
+  --pico-switch-checked-background-color: var(--accent-1);
+  --pico-switch-color: #ffffff;
+
+  /* Range */
+  --pico-range-border-color: rgba(15, 23, 42, 0.2);
+  --pico-range-active-border-color: rgba(124, 58, 237, 0.65);
+  --pico-range-thumb-border-color: var(--accent-1);
+  --pico-range-thumb-color: var(--accent-1);
+  --pico-range-thumb-active-color: #6d28d9;
+
+  /* Accordion */
+  --pico-accordion-border-color: rgba(15, 23, 42, 0.12);
+  --pico-accordion-active-summary-color: #0f172a;
+  --pico-accordion-close-summary-color: #0f172a;
+  --pico-accordion-open-summary-color: #0f172a;
+
+  /* Box shadow (slightly richer than before) */
+  --pico-box-shadow: 0 0.25rem 1.25rem rgba(15, 23, 42, 0.08),
+    0 0.125rem 0.5rem rgba(15, 23, 42, 0.05);
+}
+
+/*
+ * Direct overrides with !important to beat Pico's @layer specificity
+ */
+html,
+body {
+  color: #0f172a !important;
+}
+
+body {
+  font-family: "Inter", sans-serif;
+  background-color: #f6f7ff !important;
+  background-image: radial-gradient(
+      1200px 600px at 10% 5%,
+      rgba(124, 58, 237, 0.18),
+      transparent 60%
+    ),
+    radial-gradient(
+      900px 520px at 90% 0%,
+      rgba(6, 182, 212, 0.16),
+      transparent 55%
+    ),
+    radial-gradient(
+      900px 520px at 75% 90%,
+      rgba(249, 115, 22, 0.12),
+      transparent 60%
+    ),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0));
+  background-attachment: fixed;
+}
+
+/* Ensure form controls and buttons use Inter (browsers don't always inherit) */
+button,
+input,
+select {
+  font-family: "Inter", sans-serif !important;
+  color: #0f172a !important;
+}
+
+main.container {
+  background-color: transparent !important;
+  max-width: 1100px;
+}
+
+article {
+  background-color: rgba(255, 255, 255, 0.88) !important;
+  border-color: rgba(15, 23, 42, 0.12) !important;
+  box-shadow: var(--pico-box-shadow);
+  backdrop-filter: blur(8px);
+  border-radius: 0.85rem;
+}
+
+section {
+  background-color: transparent !important;
+}
+
+header {
+  background-color: transparent !important;
+}
+
+fieldset {
+  background-color: transparent !important;
+}
+
+textarea,
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="search"],
+input[type="url"],
+input[type="tel"],
+input[type="number"],
+select {
+  background-color: rgba(255, 255, 255, 0.92) !important;
+  border-color: rgba(15, 23, 42, 0.22) !important;
+  color: #0f172a !important;
+  border-radius: 0.85rem;
+}
+
+textarea:focus,
+input:focus,
+select:focus {
+  border-color: rgba(124, 58, 237, 0.65) !important;
+  box-shadow: 0 0 0 0.2rem rgba(124, 58, 237, 0.18) !important;
+}
+
+textarea::placeholder,
+input::placeholder {
+  color: rgba(15, 23, 42, 0.45) !important;
+}
+
+code,
+pre {
+  background-color: rgba(124, 58, 237, 0.08) !important;
+  color: #0f172a !important;
+  border-radius: 0.6rem;
+}
+
+code,
+pre,
+textarea {
+  font-family: "Fira Code", monospace !important;
+}
+
+/* Links: more lively accent */
+a {
+  color: var(--accent-1) !important;
+  text-decoration-color: rgba(124, 58, 237, 0.45) !important;
+}
+
+a:hover,
+a:focus {
+  color: #6d28d9 !important;
+  text-decoration-color: rgba(109, 40, 217, 0.55) !important;
+}
+
+/* Primary action button: gradient, still simple */
+button[type="submit"] {
+  background: linear-gradient(135deg, var(--accent-1), var(--accent-2)) !important;
+  color: #ffffff !important;
+  border: 0 !important;
+  box-shadow: 0 0.5rem 1.25rem rgba(124, 58, 237, 0.18);
+  border-radius: 0.95rem;
+}
+
+button[type="submit"]:hover {
+  filter: brightness(0.98);
+}
+
+button[type="submit"]:focus {
+  box-shadow: 0 0 0 0.2rem rgba(124, 58, 237, 0.22),
+    0 0.5rem 1.25rem rgba(124, 58, 237, 0.18) !important;
+}
+
+/* Keep other buttons neutral */
+button:not([type="submit"]),
+[type="button"],
+[role="button"] {
+  background-color: rgba(255, 255, 255, 0.92) !important;
+  color: #0f172a !important;
+  border-color: rgba(15, 23, 42, 0.25) !important;
+  border-radius: 0.85rem;
+}
+
+button:not([type="submit"]):hover,
+[type="button"]:hover,
+[role="button"]:hover {
+  background-color: rgba(124, 58, 237, 0.06) !important;
+  border-color: rgba(124, 58, 237, 0.35) !important;
+}
+
+/* Spacing */
+h1 {
+  margin-bottom: 0.25rem;
+  letter-spacing: -0.02em;
+}
+
+/* Centered header like the mockup + a bit more personality */
+.page-header {
+  text-align: center;
+  padding-top: 2.25rem;
+  padding-bottom: 1rem;
+}
+
+.page-header h1 {
+  background: linear-gradient(
+    120deg,
+    #0f172a 20%,
+    var(--accent-1) 55%,
+    var(--accent-2) 90%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.page-header .subtitle {
+  margin-top: 0;
+  color: var(--pico-muted-color);
+  max-width: 52rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Fixed Info control (stays on screen while scrolling) */
+details.info {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 4000;
+  display: inline-block;
+}
+
+details.info summary {
+  list-style: none;
+}
+
+details.info summary::-webkit-details-marker {
+  display: none;
+}
+
+details.info summary::marker {
+  content: "";
+}
+
+details.info > summary[role="button"] {
+  width: fit-content !important;
+  display: inline-flex !important;
+  align-items: center;
+  border-radius: 999px !important;
+  background: rgba(255, 255, 255, 0.85) !important;
+  border-color: rgba(124, 58, 237, 0.3) !important;
+  box-shadow: var(--pico-box-shadow);
+  position: relative;
+  z-index: 12000; /* keep it above the popover on mobile */
+}
+
+details.info > summary[role="button"]:hover {
+  background: rgba(124, 58, 237, 0.06) !important;
+  border-color: rgba(124, 58, 237, 0.42) !important;
+}
+
+/* Popover: centered + scrollable */
+details.info:not([open]) .popover {
+  display: none;
+}
+
+details.info .popover {
+  position: fixed;
+  left: 50%;
+  top: 4.25rem;
+  transform: translateX(-50%);
+  z-index: 11000;
+  width: min(42rem, 92vw);
+  max-height: calc(100vh - 6rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+
+  padding: 1rem 1.1rem;
+  background: rgba(255, 255, 255, 0.92) !important;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  border-radius: 0.85rem;
+  box-shadow: var(--pico-box-shadow);
+  backdrop-filter: blur(10px);
+}
+
+details.info .popover h3:first-child {
+  margin-top: 0;
+}
+
+details.info .when-open {
+  display: none;
+}
+
+details.info[open] .when-open {
+  display: inline;
+}
+
+details.info[open] .when-closed {
+  display: none;
+}
+
+@media (max-width: 576px) {
+  details.info .popover {
+    top: 0.75rem;
+    width: calc(100vw - 1.5rem);
+    max-height: calc(100vh - 1.5rem);
+    border-radius: 1rem;
+    padding-top: 3.5rem; /* space so content doesn't hide behind Close button */
+  }
+
+  /* Keep close button visible on small screens */
+  details.info > summary[role="button"] {
+    position: fixed !important;
+    top: 1rem;
+    right: 1rem;
+  }
+}
+
+/* Strategy rows (keep the icon next to the label text) */
+.strategy-row {
+  display: grid;
+  grid-template-columns: auto max-content;
+  align-items: center;
+  justify-content: start;
+  column-gap: 0.5rem;
+  row-gap: 0.25rem;
+  width: 100%;
+  overflow: visible;
+}
+
+.strategy-row > label {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0 !important;
+  min-width: 0;
+  max-width: 100%;
+  width: auto !important;
+  white-space: normal;
+  justify-self: start;
+}
+
+.strategy-row > .hint-wrap {
+  margin: 0 !important;
+  justify-self: start;
+}
+
+/* Hint button + tooltip (no <details>, so clicking won't toggle-close) */
+.hint-wrap {
+  position: relative;
+  display: inline-block;
+  align-self: center;
+}
+
+button.hint {
+  appearance: none;
+  -webkit-appearance: none;
+  border: 1px solid rgba(124, 58, 237, 0.35);
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--accent-1);
+  width: 1.8rem;
+  height: 1.2rem;
+  padding: 0;
+  border-radius: 999px;
+  line-height: 1;
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 0.02em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 0.25rem 0.75rem rgba(15, 23, 42, 0.06);
+}
+
+button.hint:hover {
+  background: rgba(124, 58, 237, 0.06);
+  border-color: rgba(124, 58, 237, 0.5);
+}
+
+button.hint:focus {
+  outline: none;
+  box-shadow: 0 0 0 0.2rem rgba(124, 58, 237, 0.18),
+    0 0.25rem 0.75rem rgba(15, 23, 42, 0.06);
+}
+
+.hint-wrap .tooltip {
+  display: none;
+  position: absolute;
+  left: 0;
+  top: calc(100% + 0.45rem);
+  z-index: 2000;
+  box-sizing: border-box;
+  width: min(42rem, 92vw);
+  padding: 0.75rem 0.9rem;
+  background: rgba(255, 255, 255, 0.92) !important;
+  color: #0f172a;
+  border: 1px solid rgba(124, 58, 237, 0.22);
+  border-radius: 0.85rem;
+  box-shadow: var(--pico-box-shadow);
+  backdrop-filter: blur(10px);
+  font-size: 0.95rem;
+  line-height: 1.35;
+  text-align: left;
+  white-space: normal;
+}
+
+/* Show tooltip on hover (desktop) and while focused (click/tap) */
+.hint-wrap:hover .tooltip,
+.hint-wrap:focus-within .tooltip {
+  display: block;
+}
+
+/* Output formatting */
+#output pre,
+#stats pre {
+  white-space: pre-wrap;
+  overflow-x: auto;
+}
+
+/* Details summaries */
+details > summary[role="button"] {
+  width: fit-content !important;
+}

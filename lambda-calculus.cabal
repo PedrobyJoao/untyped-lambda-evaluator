@@ -29,6 +29,7 @@ executable lambda-calculus
         lambda-calculus,
         scotty,
         text,
+        megaparsec,
         wai,
         wai-middleware-static
 
