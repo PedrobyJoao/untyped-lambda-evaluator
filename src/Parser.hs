@@ -1,4 +1,4 @@
-module Parser where
+module Parser (parseStr) where
 
 import           Data.Void                  (Void)
 import           Named

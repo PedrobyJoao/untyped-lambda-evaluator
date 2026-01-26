@@ -1,4 +1,4 @@
-module Named where
+module Named (Expr(..), Var(..), BetaReduction(..), eval) where
 
 data Expr = Var Var | App Expr Expr | Lam Var Expr
   deriving (Eq)
