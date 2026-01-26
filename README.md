@@ -4,10 +4,17 @@
 - [x] Beta-reductions: Call by name, applicative, and normal order
 - [x] Parser
 - [ ] IO-Webpage
+  - [ ] responsive and pretty
+  - [ ] statistics: steps
+  - [ ] statistics: eval time
+  - [ ] statistics: memory?
+  - [ ] check reliability of htmx/pico urls and versions
   - [ ] dropdown info about lambda calculus and b reduction strategies..
+- [ ] hardcoded limit to the number of steps
 - [ ] Equational reference
 - [ ] CI/CD with tests and build
 - [ ] Extra (I may not do it):
+  - [ ] UI: run all b-red strategies and compare them
   - [ ] Evaluator: HOAS and de Bruijn index?
   - [ ] Parser: Syntax sugar for multiple args (`\x y z.`)
 
@@ -23,3 +30,4 @@
 - https://lambster.dev/
 - https://lambdacalc.dev/
 - https://lambdacalceval.ronaldmcorona.vercel.app/
+- https://serokell.io/blog/untyped-lambda-calculus
