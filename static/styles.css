@@ -295,8 +295,8 @@ h1 {
 }
 
 .ui-icon--sm {
-  width: 0.9rem;
-  height: 0.9rem;
+  width: 0.78rem;
+  height: 0.78rem;
 }
 
 .ui-icon--lg {
@@ -355,30 +355,30 @@ h1 {
 fieldset {
   border: 1px solid var(--border) !important;
   background: var(--surface-2) !important;
-  border-radius: 1rem;
-  padding: 0.65rem 0.85rem !important;
+  border-radius: 0.75rem;
+  padding: 0.35rem 0.55rem !important;
 
   display: flex;
   flex-wrap: wrap;
-  gap: 0.35rem 1.15rem;
+  gap: 0.15rem 0.75rem;
   align-items: center;
 }
 
 fieldset > legend {
   flex: 0 0 100%;
-  margin: 0 0 0.15rem 0 !important;
-  padding: 0 0.25rem;
-  font-size: 0.88rem;
-  font-weight: 700;
-  letter-spacing: 0.01em;
-  color: rgba(31, 41, 55, 0.75);
+  margin: 0 0 0.08rem 0 !important;
+  padding: 0 0.15rem;
+  font-size: 0.78rem;
+  font-weight: 650;
+  letter-spacing: 0;
+  color: rgba(31, 41, 55, 0.7);
 }
 
 @media (max-width: 576px) {
   fieldset {
     flex-direction: column;
     align-items: flex-start;
-    gap: 0.5rem;
+    gap: 0.3rem;
   }
 }
 
@@ -386,20 +386,20 @@ fieldset > legend {
 .strategy-row {
   display: inline-flex;
   align-items: center;
-  gap: 0.55rem;
-  padding: 0.1rem 0;
+  gap: 0.35rem;
+  padding: 0.02rem 0;
   width: auto;
 }
 
 .strategy-row > label {
   display: inline-flex !important;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.35rem;
   margin: 0 !important;
   white-space: nowrap;
-  font-size: 0.98rem;
-  font-weight: 550;
-  letter-spacing: 0.005em;
+  font-size: 0.85rem;
+  font-weight: 520;
+  letter-spacing: 0;
 }
 
 .strategy-row > label > span {
@@ -408,10 +408,10 @@ fieldset > legend {
 
 .strategy-row input[type="radio"] {
   margin: 0 !important;
-  transform: translateY(0.5px);
+  transform: translateY(0.5px) scale(0.82);
 }
 
-/* Hint button + tooltip — MUCH smaller */
+/* Hint button + tooltip — smaller */
 .hint-wrap {
   position: relative;
   display: inline-block;
@@ -422,54 +422,65 @@ button.hint {
   appearance: none;
   -webkit-appearance: none;
 
-  width: 1.65rem !important;
-  height: 1.65rem !important;
+  width: 1.2rem !important;
+  height: 1.2rem !important;
   padding: 0 !important;
-  border-radius: 0.6rem !important;
+  border-radius: 0.45rem !important;
 
   display: inline-flex !important;
   align-items: center;
   justify-content: center;
 
   color: var(--accent) !important;
-  border: 1px solid rgba(180, 83, 9, 0.28) !important;
+  border: 1px solid rgba(180, 83, 9, 0.22) !important;
   background: var(--surface) !important;
 
   cursor: pointer;
-  box-shadow: 0 0.2rem 0.6rem rgba(31, 41, 55, 0.05);
+  box-shadow: 0 0.12rem 0.38rem rgba(31, 41, 55, 0.04);
 }
 
 button.hint:hover {
   background: rgba(180, 83, 9, 0.06) !important;
-  border-color: rgba(180, 83, 9, 0.45) !important;
+  border-color: rgba(180, 83, 9, 0.4) !important;
 }
 
 button.hint:focus {
   outline: none;
-  box-shadow: 0 0 0 0.18rem rgba(180, 83, 9, 0.16),
-    0 0.2rem 0.6rem rgba(31, 41, 55, 0.05) !important;
+  box-shadow: 0 0 0 0.14rem rgba(180, 83, 9, 0.14),
+    0 0.12rem 0.38rem rgba(31, 41, 55, 0.04) !important;
 }
 
 .hint-wrap .tooltip {
   display: none;
   position: absolute;
   left: 0;
-  top: calc(100% + 0.45rem);
+  top: calc(100% + 0.4rem);
   z-index: 2000;
   box-sizing: border-box;
   width: min(30rem, 88vw);
-  padding: 0.65rem 0.8rem;
+  padding: 0.55rem 0.7rem;
 
   background: var(--surface) !important;
   color: var(--text);
   border: 1px solid rgba(31, 41, 55, 0.14);
-  border-radius: 0.85rem;
+  border-radius: 0.75rem;
   box-shadow: var(--pico-box-shadow);
 
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   line-height: 1.35;
   text-align: left;
   white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+/* Prevent tooltip truncation/off-screen on mobile */
+@media (max-width: 576px) {
+  .hint-wrap .tooltip {
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100vw - 2rem);
+    max-width: 28rem;
+  }
 }
 
 /* Show tooltip on hover (desktop) and while focused (click/tap) */
