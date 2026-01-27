@@ -1,19 +1,13 @@
 module ParserSpec (spec) where
 
-import           Named      (Expr (..), Var (..))
-import           Parser     (parseStr)
+import           Named        (Expr (..), Var (..))
+import           Parser       (parseStr)
 import           Test.Hspec
+import           TestFixtures
 
 spec :: Spec
 spec = do
   describe "Parser.Valid" $ do
-    let x = MkVar "x"
-        y = MkVar "y"
-        z = MkVar "z"
-        f = MkVar "f"
-        g = MkVar "g"
-        a = MkVar "a"
-
     it "parses a variable" $ do
       expectParse "x" (Var x)
 
@@ -57,16 +51,13 @@ spec = do
              (Var a))
 
     it "parses more complex grouping examples" $ do
-      -- f (g x) z  == ((f (g x)) z)
-      expectParse "f (g x) z"
+      -- f (a x) z  == ((f (a x)) z)
+      expectParse "f (a x) z"
         (App (App (Var f)
-                  (App (Var g) (Var x)))
+                  (App (Var a) (Var x)))
              (Var z))
 
   describe "Parser.Lexeme" $ do
-    let x = MkVar "x"
-        a = MkVar "a"
-
     it "accepts leading spaces at the beginning of the expression" $ do
       expectParse "   x" (Var x)
 

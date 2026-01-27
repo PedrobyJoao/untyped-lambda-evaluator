@@ -15,7 +15,7 @@ library
     -- other-modules:
     -- other-extensions:
     build-depends:    base ^>=4.20.2.0,
-                      megaparsec
+                      megaparsec,
     hs-source-dirs:   src
 
 executable lambda-calculus
@@ -43,7 +43,9 @@ test-suite lambda-calculus-test
         NamedSpec
         NamedCallByNameSpec
         FullBetaRSpec
+        AlphaEqSpec
         ParserSpec
+        TestFixtures
     hs-source-dirs:   test
     build-depends:
         base ^>=4.20.2.0,

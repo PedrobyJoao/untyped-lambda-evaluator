@@ -2,37 +2,7 @@ module FullBetaRSpec (spec) where
 
 import           Named
 import           Test.Hspec
-
-x, y, z, a, b :: Var
-x = MkVar "x"
-y = MkVar "y"
-z = MkVar "z"
-a = MkVar "a"
-b = MkVar "b"
-y' = MkVar "y'"
-y'' = MkVar "y''"
-
--- Well-known combinators
-
--- I = λx.x
-identityI :: Expr
-identityI = Lam x (Var x)
-
--- K = λx.λy.x (True / Constant)
-trueK :: Expr
-trueK = Lam x (Lam y (Var x))
-
--- KI = λx.λy.y (False)
-falseKI :: Expr
-falseKI = Lam x (Lam y (Var y))
-
--- S = λx.λy.λz.x z (y z)
-combinatorS :: Expr
-combinatorS = Lam x (Lam y (Lam z (App (App (Var x) (Var z)) (App (Var y) (Var z)))))
-
--- SKK = I (S K K reduces to Identity)
-skkExpr :: Expr
-skkExpr = App (App combinatorS trueK) trueK
+import           TestFixtures
 
 -- Helper to run eval for both FULL beta reduction strategies
 strategies :: [BetaReduction]

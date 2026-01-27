@@ -1,5 +1,7 @@
 module Named where
 
+import           Data.List (elemIndex)
+
 data Expr = Var Var | App Expr Expr | Lam Var Expr
   deriving (Eq)
 
@@ -157,3 +159,33 @@ isFreeIn binder expr = case expr of
   (App e1 e2) -> isFreeIn binder e1 || isFreeIn binder e2
   (Lam innerBinder e) -> if innerBinder == binder then False
                            else isFreeIn binder e
+
+-- =========================
+-- Alpha equivalence via De Bruijn indices
+-- =========================
+
+data DB
+  = DBFree Var
+  | DBBound Int
+  | DBApp DB DB
+  | DBLam DB
+  deriving (Eq, Show)
+
+-- Convert a named expression to De Bruijn indices.
+-- Bound variables become DBBound n, where n=0 refers to the nearest lambda binder.
+-- Free variables remain named (DBFree).
+toDB :: Expr -> DB
+toDB = go []
+  where
+    -- env: nearest binder first
+    go :: [Var] -> Expr -> DB
+    go env expr
+      | Var v <- expr = case elemIndex v env of
+          Just i  -> DBBound i
+          Nothing -> DBFree v
+      | App e1 e2 <- expr = DBApp (go env e1) (go env e2)
+      | Lam v body <- expr = DBLam (go (v : env) body)
+
+-- Alpha equivalence: compare two expressions modulo renaming of bound variables.
+alphaEq :: Expr -> Expr -> Bool
+alphaEq e1 e2 = toDB e1 == toDB e2

@@ -4,9 +4,12 @@
 - [x] Beta-reductions: Call by name, applicative, and normal order
 - [x] Parser
 - [ ] Evaluator:
+  - [ ] test fixtures vars should be wrapped in Var already
   - [ ] alpha equivalence: make tests independent from alpha rename strategy
+  - [ ] centralize test fixtures and helpers
   - [ ] `alphaRename` use something else rather than `'`
   - [ ] Bug-fix: capture introduced, see `alphaRename`
+  - [ ] resolve duplicated tests
 - [ ] IO-Webpage
   - [x] dropdown info about lambda calculus and b reduction strategies..
   - [ ] responsive and pretty

@@ -2,14 +2,11 @@ module NamedSpec where
 
 import           Named
 import           Test.Hspec
+import           TestFixtures
 
 spec :: Spec
 spec = do
   describe "substitute" $ do
-    let x = MkVar "x"
-        y = MkVar "y"
-        z = MkVar "z"
-
     it "substitutes a matching variable" $ do
       substitute x (Var x) (Var y) `shouldBe` Var y
 
@@ -54,9 +51,7 @@ spec = do
       -- (λy. (λy'. x))[x := y'] should become (λy. (λy''. y'))
       -- The inner binder y' must be renamed because y' appears free in the replacement
       -- The outer binder y does NOT need renaming (y is not free in y')
-      let y' = MkVar "y'"
-          y'' = MkVar "y''"
-          -- body: λy. (λy'. x)
+      let -- body: λy. (λy'. x)
           body = Lam y (Lam y' (Var x))
           -- free expression: y'
           free = Var y'
@@ -71,20 +66,13 @@ spec = do
       -- Substitute: (λy. x y')[x := y]
       -- Correct:    (λy''. y y')   (y' must remain free)
       -- Incorrect:  (λy'.  y y')   (y' becomes bound/captured)
-      let y'  = MkVar "y'"
-          y'' = MkVar "y''"
-          body = Lam y (App (Var x) (Var y'))
+      let body = Lam y (App (Var x) (Var y'))
           result = substitute x body (Var y)
 
       result `shouldBe` Lam y'' (App (Var y) (Var y'))
       isFreeIn y' result `shouldBe` True
 
   describe "alphaRename" $ do
-    let x = MkVar "x"
-        x' = MkVar "x'"
-        y = MkVar "y"
-        z = MkVar "z"
-
     it "renames the bound variable in a simple lambda" $ do
       alphaRename (Lam x (Var x)) `shouldBe` Lam x' (Var x')
 
@@ -119,16 +107,10 @@ spec = do
     it "does not choose v' if v' is already free in the body (regression)" $ do
       -- renaming \y.(x y') by always picking y' causes the free y' to become bound.
       -- Correct alpha-renaming must choose a fresh name, e.g. y''.
-      let y'  = MkVar "y'"
-          y'' = MkVar "y''"
       alphaRename (Lam y (App (Var x) (Var y')))
         `shouldBe` Lam y'' (App (Var x) (Var y'))
 
   describe "isFreeIn" $ do
-    let x = MkVar "x"
-        y = MkVar "y"
-        z = MkVar "z"
-
     it "returns True for a matching variable" $ do
       isFreeIn x (Var x) `shouldBe` True
 

@@ -2,41 +2,32 @@ module NamedCallByNameSpec where
 
 import           Named
 import           Test.Hspec
+import           TestFixtures
 
 --- TODO: remove general cases that is already tested
 --- in the general eval testing of all strategies
 spec :: Spec
 spec = do
   describe "eval (call by name)" $ do
-    let x = MkVar "x"
-        y = MkVar "y"
-        z = MkVar "z"
-
-    -- Identity: λx.x
-    let identity = Lam x (Var x)
-
-    -- Const: λx.λy.x
-    let const' = Lam x (Lam y (Var x))
-
     it "returns a variable as-is" $ do
       eval CallByName (Var x) `shouldBe` Var x
 
     it "returns a lambda as-is" $ do
-      eval CallByName identity `shouldBe` identity
+      eval CallByName identityI `shouldBe` identityI
 
-    it "applies identity to a variable" $ do
+    it "applies identityI to a variable" $ do
       -- (λx.x) y → y
-      eval CallByName (App identity (Var y)) `shouldBe` Var y
+      eval CallByName (App identityI (Var y)) `shouldBe` Var y
 
-    it "applies identity to identity" $ do
+    it "applies identityI to identityI" $ do
       -- (λx.x) (λx.x) → λx.x
-      eval CallByName (App identity identity) `shouldBe` identity
+      eval CallByName (App identityI identityI) `shouldBe` identityI
 
     it "applies const to two arguments" $ do
       -- (λx.λy.x) a b → a
       let a = Var (MkVar "a")
           b = Var (MkVar "b")
-      eval CallByName (App (App const' a) b) `shouldBe` a
+      eval CallByName (App (App trueK a) b) `shouldBe` a
 
     it "does not reduce under lambdas" $ do
       -- λx.(λy.y) x should NOT reduce to λx.x
@@ -60,12 +51,12 @@ spec = do
 
     it "handles nested applications" $ do
       -- ((λx.x) (λy.y)) z → z
-      eval CallByName (App (App identity (Lam y (Var y))) (Var z)) `shouldBe` Var z
+      eval CallByName (App (App identityI (Lam y (Var y))) (Var z)) `shouldBe` Var z
 
     it "handles self-application on simple terms" $ do
       -- (λx.x x) (λy.y) → (λy.y) (λy.y) → λy.y
       let selfApp = Lam x (App (Var x) (Var x))
-      eval CallByName (App selfApp identity) `shouldBe` identity
+      eval CallByName (App selfApp identityI) `shouldBe` identityI
 
     it "avoids variable capture during evaluation" $ do
       -- (λx.λy.x) y → λy'.y
@@ -77,11 +68,6 @@ spec = do
       boundVar `shouldNotBe` y
 
   describe "callByName (single step reduction)" $ do
-    let x = MkVar "x"
-        y = MkVar "y"
-        z = MkVar "z"
-        w = MkVar "w"
-
     it "reduces leftmost redex first" $ do
       -- (λx.x) y ((λz.z) w)
       -- Two redexes: (λx.x) y and (λz.z) w
@@ -104,7 +90,5 @@ spec = do
       -- ((λx.λy.y) a) b
       -- First step: reduce (λx.λy.y) a → λy.y
       -- Result: (λy.y) b
-      let a = MkVar "a"
-          b = MkVar "b"
-          expr = App (App (Lam x (Lam y (Var y))) (Var a)) (Var b)
+      let expr = App (App (Lam x (Lam y (Var y))) (Var a)) (Var b)
       callByName expr `shouldBe` Just (App (Lam y (Var y)) (Var b))
