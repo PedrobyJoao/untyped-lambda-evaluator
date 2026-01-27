@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="0"
+  height="0"
+  style="position:absolute;width:0;height:0;overflow:hidden"
+>
+  <symbol id="icon-help" viewBox="0 0 24 24">
+    <circle
+      cx="12"
+      cy="12"
+      r="9"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+    />
+    <path
+      d="M9.5 9a2.5 2.5 0 1 1 4.1 2c-.7.6-1.6 1.1-1.6 2.5"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+    />
+    <circle cx="12" cy="17" r="1" fill="currentColor" />
+  </symbol>
+</svg>

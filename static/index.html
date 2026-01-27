@@ -20,19 +20,32 @@
     />
 
     <!-- Custom theme (must come AFTER Pico) -->
-    <link rel="stylesheet" href="/static/styles.css" />
+    <link rel="stylesheet" href="/static/styles.css?v=2" />
   </head>
 
   <body>
-    <!-- Fixed Info control (no JS) -->
-    <details class="info">
-      <summary role="button" class="secondary outline">
-        <span class="when-closed">Info</span>
-        <span class="when-open">Close</span>
-      </summary>
+    <!-- Fixed Info button (opens Pico modal) -->
+    <button
+      id="openInfo"
+      class="secondary outline"
+      type="button"
+      aria-label="Info"
+    >
+      <svg class="ui-icon ui-icon--lg" aria-hidden="true" focusable="false">
+        <use href="/static/icons.svg#icon-help" xlink:href="/static/icons.svg#icon-help"></use>
+      </svg>
+    </button>
 
-      <div class="popover">
-        <h3>About</h3>
+    <!-- Pico Modal -->
+    <dialog id="infoModal" aria-labelledby="infoModalTitle">
+      <article>
+        <header>
+          <button id="closeInfo" aria-label="Close" rel="prev"></button>
+          <p>
+            <strong id="infoModalTitle">About</strong>
+          </p>
+        </header>
+
         <p>
           This app parses and evaluates lambda calculus expressions using
           different β-reduction strategies.
@@ -68,8 +81,14 @@
             form exists.
           </li>
         </ul>
-      </div>
-    </details>
+
+        <footer>
+          <button class="secondary" type="button" id="closeInfoFooter">
+            Close
+          </button>
+        </footer>
+      </article>
+    </dialog>
 
     <main class="container">
       <header class="page-header">
@@ -105,7 +124,9 @@
                   aria-label="Normal order strategy hint"
                   aria-describedby="hint-normal"
                 >
-                  i
+                  <svg class="ui-icon ui-icon--sm" aria-hidden="true" focusable="false">
+                    <use href="/static/icons.svg#icon-help" xlink:href="/static/icons.svg#icon-help"></use>
+                  </svg>
                 </button>
                 <div id="hint-normal" class="tooltip" role="tooltip">
                   Leftmost outermost reduction. If a normal form exists, normal
@@ -127,7 +148,9 @@
                   aria-label="Call-by-name strategy hint"
                   aria-describedby="hint-cbn"
                 >
-                  i
+                  <svg class="ui-icon ui-icon--sm" aria-hidden="true" focusable="false">
+                    <use href="/static/icons.svg#icon-help" xlink:href="/static/icons.svg#icon-help"></use>
+                  </svg>
                 </button>
                 <div id="hint-cbn" class="tooltip" role="tooltip">
                   Reduces only the leftmost outermost until a lambda, then
@@ -150,7 +173,9 @@
                   aria-label="Applicative order strategy hint"
                   aria-describedby="hint-applicative"
                 >
-                  i
+                  <svg class="ui-icon ui-icon--sm" aria-hidden="true" focusable="false">
+                    <use href="/static/icons.svg#icon-help" xlink:href="/static/icons.svg#icon-help"></use>
+                  </svg>
                 </button>
                 <div id="hint-applicative" class="tooltip" role="tooltip">
                   Rightmost innermost reduction (arguments first). May diverge
@@ -169,5 +194,45 @@
     </main>
 
     <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+    <script>
+      (function () {
+        const openBtn = document.getElementById("openInfo");
+        const dialog = document.getElementById("infoModal");
+        const closeBtn = document.getElementById("closeInfo");
+        const closeFooterBtn = document.getElementById("closeInfoFooter");
+
+        function openModal() {
+          if (typeof dialog.showModal === "function") {
+            dialog.showModal();
+          } else {
+            // Fallback: if <dialog> not supported, just show it as open.
+            dialog.setAttribute("open", "open");
+          }
+        }
+
+        function closeModal() {
+          if (typeof dialog.close === "function") {
+            dialog.close();
+          } else {
+            dialog.removeAttribute("open");
+          }
+        }
+
+        openBtn.addEventListener("click", openModal);
+        closeBtn.addEventListener("click", closeModal);
+        closeFooterBtn.addEventListener("click", closeModal);
+
+        // Close when clicking the backdrop (outside the article)
+        dialog.addEventListener("click", (e) => {
+          if (e.target === dialog) closeModal();
+        });
+
+        // Ensure ESC works consistently even with fallback
+        dialog.addEventListener("cancel", (e) => {
+          e.preventDefault();
+          closeModal();
+        });
+      })();
+    </script>
   </body>
 </html>
