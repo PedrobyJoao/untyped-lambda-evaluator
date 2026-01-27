@@ -64,6 +64,21 @@ spec = do
       -- Should be: λy. (λy''. y')
       result `shouldBe` Lam y (Lam y'' (Var y'))
 
+    it "avoids capture when the chosen fresh name already appears free in the body (regression)" $ do
+      -- This exposes the bug where alphaRename always chooses v' even if v' is
+      -- already free in the body, causing capture.
+      --
+      -- Substitute: (λy. x y')[x := y]
+      -- Correct:    (λy''. y y')   (y' must remain free)
+      -- Incorrect:  (λy'.  y y')   (y' becomes bound/captured)
+      let y'  = MkVar "y'"
+          y'' = MkVar "y''"
+          body = Lam y (App (Var x) (Var y'))
+          result = substitute x body (Var y)
+
+      result `shouldBe` Lam y'' (App (Var y) (Var y'))
+      isFreeIn y' result `shouldBe` True
+
   describe "alphaRename" $ do
     let x = MkVar "x"
         x' = MkVar "x'"
@@ -100,6 +115,14 @@ spec = do
       -- λx. (λy. x y) -> λx'. (λy. x' y)
       alphaRename (Lam x (Lam y (App (Var x) (Var y))))
         `shouldBe` Lam x' (Lam y (App (Var x') (Var y)))
+
+    it "does not choose v' if v' is already free in the body (regression)" $ do
+      -- renaming \y.(x y') by always picking y' causes the free y' to become bound.
+      -- Correct alpha-renaming must choose a fresh name, e.g. y''.
+      let y'  = MkVar "y'"
+          y'' = MkVar "y''"
+      alphaRename (Lam y (App (Var x) (Var y')))
+        `shouldBe` Lam y'' (App (Var x) (Var y'))
 
   describe "isFreeIn" $ do
     let x = MkVar "x"

@@ -1,4 +1,4 @@
-module Named (Expr(..), Var(..), BetaReduction(..), eval) where
+module Named where
 
 data Expr = Var Var | App Expr Expr | Lam Var Expr
   deriving (Eq)
@@ -129,6 +129,14 @@ substitute binder body arg = case body of
     | otherwise -> Lam v (substitute binder e arg)
 
 -- Given (λx.<expr>), rename all occurrences of `x`, including the bound var
+--
+-- BUG: v' is free in the body you’re renaming (capture introduced)
+--
+-- alphaRename (\x.\y.(x y')) y
+-- --
+-- \y'.(x y')
+--
+-- `y'` is now artificially bounded
 alphaRename :: Expr -> Expr
 alphaRename (Lam var expr) = Lam newV (go var newV expr)
   where

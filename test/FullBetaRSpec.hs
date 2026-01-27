@@ -10,6 +10,7 @@ z = MkVar "z"
 a = MkVar "a"
 b = MkVar "b"
 y' = MkVar "y'"
+y'' = MkVar "y''"
 
 -- Well-known combinators
 
@@ -93,6 +94,14 @@ spec = do
       testFullBetaReductions "(λx.λy.x y) y avoids capture"
         (App (Lam x (Lam y (App (Var x) (Var y)))) (Var y))
         (Lam (y') (App (Var y) (Var (y'))))
+
+      -- Regression: naive alphaRename picks y' even if y' is already free in the body,
+      -- which would incorrectly capture it.
+      --
+      -- (λx.λy.(x y')) y  ==>  λy''.(y y')   (y' must remain free)
+      testFullBetaReductions "(λx.λy.x y') y avoids capture when y' is free in the body (regression)"
+        (App (Lam x (Lam y (App (Var x) (Var y')))) (Var y))
+        (Lam y'' (App (Var y) (Var y')))
 
     describe "Complex expressions" $ do
       testFullBetaReductions "(λx.x x)(λy.y) = λy.y"
