@@ -3,13 +3,17 @@
 - [x] Alpha-renaming
 - [x] Beta-reductions: Call by name, applicative, and normal order
 - [x] Parser
+- [ ] Evaluator:
+  - [ ] alpha equivalence: make tests independent from alpha rename strategy
+  - [ ] `alphaRename` use something else rather than `'`
+  - [ ] Bug-fix: capture introduced, see `alphaRename`
 - [ ] IO-Webpage
+  - [x] dropdown info about lambda calculus and b reduction strategies..
   - [ ] responsive and pretty
   - [ ] statistics: steps
   - [ ] statistics: eval time
   - [ ] statistics: memory?
   - [ ] check reliability of htmx/pico urls and versions
-  - [ ] dropdown info about lambda calculus and b reduction strategies..
 - [ ] hardcoded limit to the number of steps
 - [ ] Equational reference
 - [ ] CI/CD with tests and build
@@ -24,10 +28,10 @@
 - https://en.wikipedia.org/wiki/Lambda_calculus
 - https://www.cs.bu.edu/fac/snyder/cs320/Lectures/Lecture15--%20Lambda%20Calculus%20II.pdf
 - https://opendsa.cs.vt.edu/ODSA/Books/PL/html/ReductionStrategies.html
+- https://serokell.io/blog/untyped-lambda-calculus
 
 ## Similar work:
 
 - https://lambster.dev/
 - https://lambdacalc.dev/
 - https://lambdacalceval.ronaldmcorona.vercel.app/
-- https://serokell.io/blog/untyped-lambda-calculus
