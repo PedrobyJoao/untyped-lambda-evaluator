@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300..700&family=Inter:wght@100..900&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300..700&family=JetBrains+Mono:wght@300..800&display=swap"
       rel="stylesheet"
     />
 
@@ -24,7 +24,6 @@
   </head>
 
   <body>
-    <!-- Fixed Info button (opens Pico modal) -->
     <button
       id="openInfo"
       class="secondary outline"
@@ -32,7 +31,10 @@
       aria-label="Info"
     >
       <svg class="ui-icon ui-icon--lg" aria-hidden="true" focusable="false">
-        <use href="/static/icons.svg#icon-help" xlink:href="/static/icons.svg#icon-help"></use>
+        <use
+          href="/static/icons.svg#icon-help"
+          xlink:href="/static/icons.svg#icon-help"
+        ></use>
       </svg>
     </button>
 
@@ -98,8 +100,9 @@
         </p>
       </header>
 
-      <section>
+      <article class="panel">
         <form hx-post="/eval" hx-target="#results" hx-swap="innerHTML">
+          <label for="expr" class="sr-only">Expression</label>
           <textarea
             id="expr"
             name="expr"
@@ -109,7 +112,7 @@
           ></textarea>
 
           <fieldset>
-            <legend>Strategy</legend>
+            <legend>Beta-Reduction strategy:</legend>
 
             <div class="strategy-row">
               <label>
@@ -124,8 +127,15 @@
                   aria-label="Normal order strategy hint"
                   aria-describedby="hint-normal"
                 >
-                  <svg class="ui-icon ui-icon--sm" aria-hidden="true" focusable="false">
-                    <use href="/static/icons.svg#icon-help" xlink:href="/static/icons.svg#icon-help"></use>
+                  <svg
+                    class="ui-icon ui-icon--sm"
+                    aria-hidden="true"
+                    focusable="false"
+                  >
+                    <use
+                      href="/static/icons.svg#icon-help"
+                      xlink:href="/static/icons.svg#icon-help"
+                    ></use>
                   </svg>
                 </button>
                 <div id="hint-normal" class="tooltip" role="tooltip">
@@ -148,8 +158,15 @@
                   aria-label="Call-by-name strategy hint"
                   aria-describedby="hint-cbn"
                 >
-                  <svg class="ui-icon ui-icon--sm" aria-hidden="true" focusable="false">
-                    <use href="/static/icons.svg#icon-help" xlink:href="/static/icons.svg#icon-help"></use>
+                  <svg
+                    class="ui-icon ui-icon--sm"
+                    aria-hidden="true"
+                    focusable="false"
+                  >
+                    <use
+                      href="/static/icons.svg#icon-help"
+                      xlink:href="/static/icons.svg#icon-help"
+                    ></use>
                   </svg>
                 </button>
                 <div id="hint-cbn" class="tooltip" role="tooltip">
@@ -173,8 +190,15 @@
                   aria-label="Applicative order strategy hint"
                   aria-describedby="hint-applicative"
                 >
-                  <svg class="ui-icon ui-icon--sm" aria-hidden="true" focusable="false">
-                    <use href="/static/icons.svg#icon-help" xlink:href="/static/icons.svg#icon-help"></use>
+                  <svg
+                    class="ui-icon ui-icon--sm"
+                    aria-hidden="true"
+                    focusable="false"
+                  >
+                    <use
+                      href="/static/icons.svg#icon-help"
+                      xlink:href="/static/icons.svg#icon-help"
+                    ></use>
                   </svg>
                 </button>
                 <div id="hint-applicative" class="tooltip" role="tooltip">
@@ -187,7 +211,7 @@
 
           <button type="submit">Evaluate</button>
         </form>
-      </section>
+      </article>
 
       <!-- Hidden by default by being empty; populated after /eval -->
       <div id="results"></div>
