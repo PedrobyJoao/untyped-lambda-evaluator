@@ -8,36 +8,44 @@ spec :: Spec
 spec = do
   describe "substitute" $ do
     it "substitutes a matching variable" $ do
-      shouldAlphaEq (substitute x (Var x) (Var y))
+      shouldAlphaEq (substitute x (Var x)
+                            (Var y))
                             (Var y)
 
     it "leaves a non-matching variable unchanged" $ do
-      shouldAlphaEq (substitute x (Var y) (Var z))
+      shouldAlphaEq (substitute x (Var y)
+                            (Var z))
                             (Var y)
 
     it "substitutes in the left side of an application" $ do
-      shouldAlphaEq (substitute x (App (Var x) (Var y)) (Var z))
+      shouldAlphaEq (substitute x (App (Var x) (Var y))
+                            (Var z))
                             (App (Var z) (Var y))
 
     it "substitutes in the right side of an application" $ do
-      shouldAlphaEq (substitute x (App (Var y) (Var x)) (Var z))
+      shouldAlphaEq (substitute x (App (Var y) (Var x))
+                            (Var z))
                             (App (Var y) (Var z))
 
     it "substitutes in both sides of an application" $ do
-      shouldAlphaEq (substitute x (App (Var x) (Var x)) (Var y))
+      shouldAlphaEq (substitute x (App (Var x) (Var x))
+                            (Var y))
                             (App (Var y) (Var y))
 
     it "does not substitute under a lambda that binds the same variable" $ do
-      shouldAlphaEq (substitute x (Lam x (Var x)) (Var y))
+      shouldAlphaEq (substitute x (Lam x (Var x))
+                            (Var y))
                             (Lam x (Var x))
 
     it "substitutes under a lambda that binds a different variable" $ do
-      shouldAlphaEq (substitute x (Lam y (Var x)) (Var z))
+      shouldAlphaEq (substitute x (Lam y (Var x))
+                            (Var z))
                             (Lam y (Var z))
 
     it "substitutes a complex expression" $ do
       let free = App (Var y) (Var z)
-      shouldAlphaEq (substitute x (Var x) free)
+      shouldAlphaEq (substitute x (Var x)
+                            free)
                             (free)
 
     it "avoids variable capture" $ do
