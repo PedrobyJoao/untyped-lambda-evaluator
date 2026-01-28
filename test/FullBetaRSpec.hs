@@ -68,10 +68,26 @@ spec = do
       -- Regression: naive alphaRename picks y' even if y' is already free in the body,
       -- which would incorrectly capture it.
       --
-      -- (λx.λy.(x y')) y  ==>  λy''.(y y')   (y' must remain free)
-      testFullBetaReductions "(λx.λy.x y') y avoids capture when y' is free in the body (regression)"
+      -- alphaRename (\x.\y.(x y')) y
+      --
+      -- VALID: \y''.(x y')
+      -- INVALID: \y'.(x y') -- y' is now bounded
+      --
+      -- TODO: I may have to move this to another place (it depends on the alphaRenam strategy)
+      testFullBetaReductions "(λx.λy.x y') y avoids capture when y' is free in the body"
         (App (Lam x (Lam y (App (Var x) (Var y')))) (Var y))
         (Lam y'' (App (Var y) (Var y')))
+
+      -- Introducing of var capture by renaming body vars
+      -- (\x. (\x_1. x)) y
+      --
+      -- VALID: y
+      -- INVALID: x_1 (in case the alpha rename results in: (\x_1.(\x_1. x_1))
+      --
+      -- TODO: I may have to move this to another place (it depends on the alphaRenam strategy)
+      testFullBetaReductions "(λx.λx_1.x) y avoids capture"
+        (App (Lam x (Lam x_1 (Var x))) (Var y))
+        (Var y)
 
     describe "Complex expressions" $ do
       testFullBetaReductions "(λx.x x)(λy.y) = λy.y"

@@ -4,7 +4,8 @@ import           Named
 import           Test.Hspec (Expectation, expectationFailure, shouldBe)
 
 -- Common variables
-f, w, x, x', y, z, a, b, y', y''  :: Var
+x_1, f, w, x, x', y, z, a, b, y', y''  :: Var
+x_1 = MkVar "x_1"
 f = MkVar "f"
 w = MkVar "w"
 x = MkVar "x"
