@@ -1,4 +1,4 @@
-module NamedSpec where
+module AlphaRenameSpec where
 
 import           Named
 import           Test.Hspec

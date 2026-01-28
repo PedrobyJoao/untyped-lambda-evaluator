@@ -40,7 +40,7 @@ test-suite lambda-calculus-test
     type:             exitcode-stdio-1.0
     main-is:          Spec.hs
     other-modules:    
-        NamedSpec
+        AlphaRenameSpec
         NamedCallByNameSpec
         FullBetaRSpec
         AlphaEqSpec
