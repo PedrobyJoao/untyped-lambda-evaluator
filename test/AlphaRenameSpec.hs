@@ -57,14 +57,26 @@ spec = do
 
       shouldAlphaEq result (Lam z (Var y))
 
-    it "avoids variable capture when naive renaming would still capture" $ do
-      -- (λy. (λy'. x))[x := y'] should become (λy. (λfresh. y'))
-      -- The inner binder y' must be renamed because y' appears free in the replacement.
-      let body = Lam y (Lam y' (Var x))
-          free = Var y'
-          result = substitute x body free
+    it "avoids variable capture when the would-be fresh name already exists as an inner binder (regression)" $ do
+      -- This is the scenario described by:
+      --   \x. (\x_1. x)
+      -- If alpha-renaming ever chose x_1 as the new name for the *outer* x,
+      -- the occurrence of x would become captured by the *inner* binder.
+      --
+      -- We force that situation through substitution:
+      --   (λx. λx_1. x y)[y := x]
+      --
+      -- Since x is free in the replacement argument (x), we must rename the outer binder x.
+      -- The "first guess" from nextVar x is x_1, but x_1 occurs anywhere in the body (as an inner binder),
+      -- so the implementation must skip it.
+      let x1 = nextVar x
+          body = Lam x (Lam x1 (App (Var x) (Var y)))
+          result = substitute y body (Var x)
 
-      shouldAlphaEq result $ Lam y (Lam z (Var y'))
+      -- We don't assert the exact fresh binder chosen; we assert the meaning/structure:
+      -- the first argument in the App must refer to the *outer* binder (DBBound 1),
+      -- not the inner binder (DBBound 0).
+      shouldAlphaEq result (Lam z (Lam x1 (App (Var z) (Var x))))
 
   describe "alphaRename" $ do
     it "renames the bound variable in a simple lambda" $ do
@@ -102,7 +114,7 @@ spec = do
     it "does not capture due to choosing a name that already occurs as an inner binder" $ do
       -- \x. (\x_1. x)
       -- If we (incorrectly) rename outer x -> x_1, the x becomes captured by the inner binder.
-      -- fetchFreshFar must therefore NOT choose x_1, and should choose x_2.
+      -- fetchFreshVar must therefore NOT choose x_1, and should choose x_2.
       let x1 = MkVar "x_1"
           x2 = MkVar "x_2"
           lam = Lam x (Lam x1 (Var x))

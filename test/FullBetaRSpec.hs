@@ -65,6 +65,13 @@ spec = do
         (App (Lam x (Lam y (App (Var x) (Var y)))) (Var y))
         (Lam z (App (Var y) (Var z)))
 
+      testFullBetaReductions "avoids capture when the would-be fresh name already exists as an inner binder (regression)"
+        (let x1 = nextVar x
+             body = Lam x (Lam x1 (App (Var x) (Var y)))
+         in App (Lam y body) (Var x))
+        (let x1 = nextVar x
+         in Lam z (Lam x1 (App (Var z) (Var x))))
+
     describe "Complex expressions" $ do
       testFullBetaReductions "(λx.x x)(λy.y) = λy.y"
         (App (Lam x (App (Var x) (Var x))) (Lam y (Var y)))
