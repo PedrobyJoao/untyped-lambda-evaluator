@@ -4,12 +4,10 @@
 - [x] Beta-reductions: Call by name, applicative, and normal order
 - [x] Parser
 - [ ] Evaluator:
-  - [ ] test fixtures vars should be wrapped in Var already
-  - [ ] alpha equivalence: make tests independent from alpha rename strategy
-  - [ ] centralize test fixtures and helpers
+  - [x] alpha equivalence: make tests independent from alpha rename strategy
   - [ ] `alphaRename` use something else rather than `'`
   - [ ] Bug-fix: capture introduced, see `alphaRename`
-  - [ ] resolve duplicated tests
+  - [ ] resolve duplicated tests for capture avoidance
 - [ ] IO-Webpage
   - [x] dropdown info about lambda calculus and b reduction strategies..
   - [ ] responsive and pretty
@@ -18,9 +16,10 @@
   - [ ] statistics: memory?
   - [ ] check reliability of htmx/pico urls and versions
 - [ ] hardcoded limit to the number of steps
-- [ ] Equational reference
+- [ ] Equational reference as: let name = e1 in e2 ⟶ (\name. e2) e1
 - [ ] CI/CD with tests and build
 - [ ] Extra (I may not do it):
+  - [ ] UI: canonical representation (x, x_1, x_2...)
   - [ ] UI: run all b-red strategies and compare them
   - [ ] Evaluator: HOAS and de Bruijn index?
   - [ ] Parser: Syntax sugar for multiple args (`\x y z.`)

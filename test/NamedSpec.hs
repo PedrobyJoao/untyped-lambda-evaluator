@@ -141,3 +141,35 @@ spec = do
     it "returns True when free in complex nested expression" $ do
       -- λy. (λz. x z) — x is free
       isFreeIn x (Lam y (Lam z (App (Var x) (Var z)))) `shouldBe` True
+
+  describe "occursAnywhere" $ do
+    it "returns True when the variable appears as a free variable" $ do
+      occursAnywhere x (Var x) `shouldBe` True
+
+    it "returns False when the variable does not appear" $ do
+      occursAnywhere x (Var y) `shouldBe` False
+
+    it "returns True when the variable appears in an application (left)" $ do
+      occursAnywhere x (App (Var x) (Var y)) `shouldBe` True
+
+    it "returns True when the variable appears in an application (right)" $ do
+      occursAnywhere x (App (Var y) (Var x)) `shouldBe` True
+
+    it "returns True when the variable appears as a binder" $ do
+      occursAnywhere x (Lam x (Var y)) `shouldBe` True
+
+    it "returns True when the variable appears under a lambda with a different binder" $ do
+      occursAnywhere x (Lam y (App (Var x) (Var y))) `shouldBe` True
+
+  describe "nextVar" $ do
+    it "adds _1 when there is no numeric suffix" $ do
+      nextVar (MkVar "x") `shouldBe` MkVar "x_1"
+
+    it "increments an existing numeric suffix" $ do
+      nextVar (MkVar "x_1") `shouldBe` MkVar "x_2"
+
+    it "increments multi-digit numeric suffixes" $ do
+      nextVar (MkVar "x_9") `shouldBe` MkVar "x_10"
+
+    it "increments numeric suffixes when the base contains underscores" $ do
+      nextVar (MkVar "a_b_1") `shouldBe` MkVar "a_b_2"

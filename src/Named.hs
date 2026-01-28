@@ -1,5 +1,6 @@
 module Named where
 
+import           Data.Char (isDigit)
 import           Data.List (elemIndex)
 
 data Expr = Var Var | App Expr Expr | Lam Var Expr
@@ -32,6 +33,7 @@ instance Show Expr where
 
 instance Show Var where
   show (MkVar v) = v
+
 
 eval :: BetaReduction -> Expr -> Expr
 eval br expr = go expr
@@ -159,6 +161,38 @@ isFreeIn binder expr = case expr of
   (App e1 e2) -> isFreeIn binder e1 || isFreeIn binder e2
   (Lam innerBinder e) -> if innerBinder == binder then False
                            else isFreeIn binder e
+
+-- true if the variable name appears anywhere (free OR as a binder)
+-- todo: tests
+occursAnywhere :: Var -> Expr -> Bool
+occursAnywhere x expr = case expr of
+  Var v      -> v == x
+  App e1 e2  -> occursAnywhere x e1 || occursAnywhere x e2
+  Lam v body -> v == x || occursAnywhere x body
+
+-- Increment a variable name using the scheme:
+-- x -> x_1
+-- x_1 -> x_2
+-- todo: tests
+nextVar :: Var -> Var
+nextVar (MkVar s) =
+  case parseNumericSuffix s of
+    Just (base, n) -> MkVar (base ++ "_" ++ show (n + 1))
+    Nothing        -> MkVar (s ++ "_1")
+  where
+    -- If the string ends with _<digits>, return (base, number).
+    -- Example: "x_9" -> Just ("x", 9)
+    --          "x"   -> Nothing
+    parseNumericSuffix :: String -> Maybe (String, Int)
+    parseNumericSuffix str =
+      let (revDigits, rest) = span isDigit (reverse str)
+      in case (revDigits, rest) of
+           ([], _) -> Nothing
+           (_, '_':revBase) ->
+             let base = reverse revBase
+                 nStr = reverse revDigits
+             in Just (base, read nStr)
+           _ -> Nothing
 
 -- =========================
 -- Alpha equivalence via De Bruijn indices
