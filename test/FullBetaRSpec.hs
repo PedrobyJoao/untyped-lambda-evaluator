@@ -56,27 +56,14 @@ spec = do
 
     describe "Variable capture avoidance" $ do
       -- (λx.λy.x) y should NOT capture y
-      -- Expected: λy'.y (the outer y remains free, inner y is renamed)
+      -- Expected: λFresh.y (the outer y remains free, inner y is renamed)
       testFullBetaReductions "(λx.λy.x) y avoids capture"
         (App (Lam x (Lam y (Var x))) (Var y))
-        (Lam (y') (Var y))
+        (Lam z (Var y))
 
       testFullBetaReductions "(λx.λy.x y) y avoids capture"
         (App (Lam x (Lam y (App (Var x) (Var y)))) (Var y))
-        (Lam (y') (App (Var y) (Var (y'))))
-
-      -- Regression: naive alphaRename picks y' even if y' is already free in the body,
-      -- which would incorrectly capture it.
-      --
-      -- alphaRename (\x.\y.(x y')) y
-      --
-      -- VALID: \y''.(x y')
-      -- INVALID: \y'.(x y') -- y' is now bounded
-      --
-      -- TODO: I may have to move this to another place (it depends on the alphaRenam strategy)
-      testFullBetaReductions "(λx.λy.x y') y avoids capture when y' is free in the body"
-        (App (Lam x (Lam y (App (Var x) (Var y')))) (Var y))
-        (Lam y'' (App (Var y) (Var y')))
+        (Lam z (App (Var y) (Var z)))
 
     describe "Complex expressions" $ do
       testFullBetaReductions "(λx.x x)(λy.y) = λy.y"

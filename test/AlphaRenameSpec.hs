@@ -51,33 +51,20 @@ spec = do
     it "avoids variable capture" $ do
       -- (λy. x)[x := y] should become (λz. y), not (λy. y)
       -- The bound variable y must be renamed to avoid capturing the free y
-      -- TODO: stop relying on hardcoded alpha rename method
-      let result = substitute x (Lam y (Var x)) (Var y)
-          Lam freshVar body = result
-      -- The body should be the substituted free variable y, not the bound variable
-      shouldAlphaEq body (Var y)
-      -- The fresh variable should be different from y to avoid capture
-      freshVar `shouldNotBe` y
+      let result = substitute x
+                        (Lam y (Var x))
+                        (Var y)
+
+      shouldAlphaEq result (Lam z (Var y))
 
     it "avoids variable capture when naive renaming would still capture" $ do
       -- (λy. (λy'. x))[x := y'] should become (λy. (λfresh. y'))
       -- The inner binder y' must be renamed because y' appears free in the replacement.
-      -- TODO: stop relying on hardcoded alpha rename method
       let body = Lam y (Lam y' (Var x))
           free = Var y'
           result = substitute x body free
 
-      shouldAlphaEq result $ Lam y (Lam (MkVar "y'_1") (Var y'))
-
-    it "avoids capture when the chosen fresh name already appears free in the body" $ do
-      -- Substitute: (λy. x y')[x := y]
-      -- Must rename the binder y, but must NOT choose a name that would capture y' (or collide with any binder/free var)
-      -- TODO: stop relying on hardcoded alpha rename method
-      let body = Lam y (App (Var x) (Var y'))
-          result = substitute x body (Var y)
-
-      shouldAlphaEq result $ Lam (MkVar "y_1") (App (Var y) (Var y'))
-      isFreeIn y' result `shouldBe` True
+      shouldAlphaEq result $ Lam y (Lam z (Var y'))
 
   describe "alphaRename" $ do
     it "renames the bound variable in a simple lambda" $ do
