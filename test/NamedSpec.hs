@@ -43,6 +43,7 @@ spec = do
     it "avoids variable capture" $ do
       -- (λy. x)[x := y] should become (λz. y), not (λy. y)
       -- The bound variable y must be renamed to avoid capturing the free y
+      -- TODO: stop relying on hardcoded alpha rename method
       let result = substitute x (Lam y (Var x)) (Var y)
           Lam freshVar body = result
       -- The body should be the substituted free variable y, not the bound variable
@@ -51,67 +52,69 @@ spec = do
       freshVar `shouldNotBe` y
 
     it "avoids variable capture when naive renaming would still capture" $ do
-      -- (λy. (λy'. x))[x := y'] should become (λy. (λy''. y'))
-      -- The inner binder y' must be renamed because y' appears free in the replacement
-      -- The outer binder y does NOT need renaming (y is not free in y')
-      let -- body: λy. (λy'. x)
-          body = Lam y (Lam y' (Var x))
-          -- free expression: y'
+      -- (λy. (λy'. x))[x := y'] should become (λy. (λfresh. y'))
+      -- The inner binder y' must be renamed because y' appears free in the replacement.
+      -- TODO: stop relying on hardcoded alpha rename method
+      let body = Lam y (Lam y' (Var x))
           free = Var y'
           result = substitute x body free
-      -- Should be: λy. (λy''. y')
-      shouldAlphaEq result $ Lam y (Lam y'' (Var y'))
 
-    it "avoids capture when the chosen fresh name already appears free in the body (regression)" $ do
-      -- This exposes the bug where alphaRename always chooses v' even if v' is
-      -- already free in the body, causing capture.
-      --
+      shouldAlphaEq result $ Lam y (Lam (MkVar "y'_1") (Var y'))
+
+    it "avoids capture when the chosen fresh name already appears free in the body" $ do
       -- Substitute: (λy. x y')[x := y]
-      -- Correct:    (λy''. y y')   (y' must remain free)
-      -- Incorrect:  (λy'.  y y')   (y' becomes bound/captured)
+      -- Must rename the binder y, but must NOT choose a name that would capture y' (or collide with any binder/free var)
+      -- TODO: stop relying on hardcoded alpha rename method
       let body = Lam y (App (Var x) (Var y'))
           result = substitute x body (Var y)
 
-      shouldAlphaEq result $ Lam y'' (App (Var y) (Var y'))
+      shouldAlphaEq result $ Lam (MkVar "y_1") (App (Var y) (Var y'))
       isFreeIn y' result `shouldBe` True
 
   describe "alphaRename" $ do
     it "renames the bound variable in a simple lambda" $ do
-      alphaRename (Lam x (Var x)) `shouldBe` Lam x' (Var x')
+      let x1 = nextVar x
+      alphaRename x1 (Lam x (Var x)) `shouldBe` Lam x1 (Var x1)
 
     it "leaves non-lambda expressions unchanged" $ do
-      alphaRename (Var x) `shouldBe` Var x
-      alphaRename (App (Var x) (Var y)) `shouldBe` App (Var x) (Var y)
+      let x1 = nextVar x
+      alphaRename x1 (Var x) `shouldBe` Var x
+      alphaRename x1 (App (Var x) (Var y)) `shouldBe` App (Var x) (Var y)
 
     it "only renames occurrences of the bound variable" $ do
-      -- λx. x y -> λx'. x' y
-      alphaRename (Lam x (App (Var x) (Var y)))
-        `shouldBe` Lam x' (App (Var x') (Var y))
+      -- λx. x y -> λx_1. x_1 y
+      let x1 = nextVar x
+      alphaRename x1 (Lam x (App (Var x) (Var y)))
+        `shouldBe` Lam x1 (App (Var x1) (Var y))
 
     it "does not rename free variables" $ do
-      -- λx. y -> λx'. y
-      alphaRename (Lam x (Var y)) `shouldBe` Lam x' (Var y)
+      -- λx. y -> λx_1. y
+      let x1 = nextVar x
+      alphaRename x1 (Lam x (Var y)) `shouldBe` Lam x1 (Var y)
 
     it "does not rename variables bound by inner lambdas" $ do
-      -- λx. (λx. x) -> λx'. (λx. x)
-      alphaRename (Lam x (Lam x (Var x)))
-        `shouldBe` Lam x' (Lam x (Var x))
+      -- λx. (λx. x) -> λx_1. (λx. x)
+      let x1 = nextVar x
+      alphaRename x1 (Lam x (Lam x (Var x)))
+        `shouldBe` Lam x1 (Lam x (Var x))
 
     it "renames in nested applications" $ do
-      -- λx. x (x z) -> λx'. x' (x' z)
-      alphaRename (Lam x (App (Var x) (App (Var x) (Var z))))
-        `shouldBe` Lam x' (App (Var x') (App (Var x') (Var z)))
+      -- λx. x (x z) -> λx_1. x_1 (x_1 z)
+      let x1 = nextVar x
+      alphaRename x1 (Lam x (App (Var x) (App (Var x) (Var z))))
+        `shouldBe` Lam x1 (App (Var x1) (App (Var x1) (Var z)))
 
-    it "handles lambda with different bound variable in body" $ do
-      -- λx. (λy. x y) -> λx'. (λy. x' y)
-      alphaRename (Lam x (Lam y (App (Var x) (Var y))))
-        `shouldBe` Lam x' (Lam y (App (Var x') (Var y)))
+    it "does not capture due to choosing a name that already occurs as an inner binder" $ do
+      -- \x. (\x_1. x)
+      -- If we (incorrectly) rename outer x -> x_1, the x becomes captured by the inner binder.
+      -- fetchFreshFar must therefore NOT choose x_1, and should choose x_2.
+      let x1 = MkVar "x_1"
+          x2 = MkVar "x_2"
+          lam = Lam x (Lam x1 (Var x))
+          chosen = fetchFreshVar x (Lam x1 (Var x)) (Var y)
 
-    it "does not choose v' if v' is already free in the body (regression)" $ do
-      -- renaming \y.(x y') by always picking y' causes the free y' to become bound.
-      -- Correct alpha-renaming must choose a fresh name, e.g. y''.
-      alphaRename (Lam y (App (Var x) (Var y')))
-        `shouldBe` Lam y'' (App (Var x) (Var y'))
+      chosen `shouldBe` x2
+      alphaRename chosen lam `shouldBe` Lam x2 (Lam x1 (Var x2))
 
   describe "isFreeIn" $ do
     it "returns True for a matching variable" $ do

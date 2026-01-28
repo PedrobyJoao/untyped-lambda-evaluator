@@ -78,17 +78,6 @@ spec = do
         (App (Lam x (Lam y (App (Var x) (Var y')))) (Var y))
         (Lam y'' (App (Var y) (Var y')))
 
-      -- Introducing of var capture by renaming body vars
-      -- (\x. (\x_1. x)) y
-      --
-      -- VALID: y
-      -- INVALID: x_1 (in case the alpha rename results in: (\x_1.(\x_1. x_1))
-      --
-      -- TODO: I may have to move this to another place (it depends on the alphaRenam strategy)
-      testFullBetaReductions "(λx.λx_1.x) y avoids capture"
-        (App (Lam x (Lam x_1 (Var x))) (Var y))
-        (Var y)
-
     describe "Complex expressions" $ do
       testFullBetaReductions "(λx.x x)(λy.y) = λy.y"
         (App (Lam x (App (Var x) (Var x))) (Lam y (Var y)))

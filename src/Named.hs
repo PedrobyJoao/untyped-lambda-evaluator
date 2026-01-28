@@ -97,6 +97,10 @@ callByName (App e1 e2) = case e1 of
   App _ _ -> (\e1' -> App e1' e2) <$> callByName e1
   Lam v e -> Just $ substitute v e e2
 
+-- =========================
+-- Alpha renaming
+-- =========================
+
 -- body[binder := arg]
 --
 -- Note on: * Variable Capture *
@@ -129,31 +133,43 @@ substitute binder body arg = case body of
   (App e1 e2) -> App (substitute binder e1 arg) (substitute binder e2 arg)
   (Lam v e)
     | binder == v -> Lam v e -- different scope for the same var name, don't try to substitute
-    | isFreeIn v arg && isFreeIn binder e -> substitute binder (alphaRename body) arg
+    | isFreeIn v arg && isFreeIn binder e ->
+        let newV = fetchFreshVar v e arg
+        in substitute binder (alphaRename newV body) arg
     | otherwise -> Lam v (substitute binder e arg)
 
--- Given (λx.<expr>), rename all occurrences of `x`, including the bound var
+-- Choose a fresh variable name for alpha-renaming a binder `oldBinder` in `body`,
+-- with respect to a substitution argument `arg`.
 --
--- BUG: v' is free in the body you’re renaming (capture introduced)
---
--- alphaRename (\x.\y.(x y')) y
--- --
--- \y'.(x y')
---
--- `y'` is now artificially bounded
-alphaRename :: Expr -> Expr
-alphaRename (Lam var expr) = Lam newV (go var newV expr)
+-- Requirements:
+-- 1) The new binder must not occur anywhere in the body (free OR as a binder),
+--    otherwise alpha-renaming can introduce capture (e.g. \x.(\x_1.x)).
+-- 2) The new binder must not be free in `arg`, otherwise the renamed binder would
+--    capture free occurrences coming from the replacement argument.
+fetchFreshVar :: Var -> Expr -> Expr -> Var
+fetchFreshVar oldBinder body arg = go (nextVar oldBinder)
   where
-    newV = newVar var
+    go candidate
+      | occursAnywhere candidate body = go (nextVar candidate)
+      | isFreeIn candidate arg        = go (nextVar candidate)
+      | otherwise                    = candidate
+
+-- Given (λx.<expr>), rename all occurrences of `x`, including the bound var,
+-- using the *provided* new binder variable.
+--
+-- Important: this function does NOT choose the new name; callers must supply
+-- a fresh name (see `fetchFreshVar`).
+alphaRename :: Var -> Expr -> Expr
+alphaRename newBinder (Lam oldBinder expr) = Lam newBinder (go oldBinder newBinder expr)
+  where
     go old new e = case e of
       (Var v)     -> if v == old then Var new else e
       (App e1 e2) -> App (go old new e1) (go old new e2)
       (Lam v le)  -> if old == v
                        then Lam v le -- new scope for `v`, just ignore
                        else Lam v (go old new le)
-    newVar (MkVar v) = MkVar (v ++ "'")
 -- todo-minor: func should only be used with abstractions, should we use Either or Maybe?
-alphaRename a         = a
+alphaRename _ a = a
 
 isFreeIn :: Var -> Expr -> Bool
 isFreeIn binder expr = case expr of
@@ -163,7 +179,6 @@ isFreeIn binder expr = case expr of
                            else isFreeIn binder e
 
 -- true if the variable name appears anywhere (free OR as a binder)
--- todo: tests
 occursAnywhere :: Var -> Expr -> Bool
 occursAnywhere x expr = case expr of
   Var v      -> v == x
@@ -173,7 +188,6 @@ occursAnywhere x expr = case expr of
 -- Increment a variable name using the scheme:
 -- x -> x_1
 -- x_1 -> x_2
--- todo: tests
 nextVar :: Var -> Var
 nextVar (MkVar s) =
   case parseNumericSuffix s of
@@ -220,6 +234,6 @@ toDB = go []
       | App e1 e2 <- expr = DBApp (go env e1) (go env e2)
       | Lam v body <- expr = DBLam (go (v : env) body)
 
--- Alpha equivalence: compare two expressions modulo renaming of bound variables.
+-- alpha equivalence: compare two expressions modulo renaming of bound variables.
 alphaEq :: Expr -> Expr -> Bool
 alphaEq e1 e2 = toDB e1 == toDB e2

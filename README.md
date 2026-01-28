@@ -5,9 +5,10 @@
 - [x] Parser
 - [ ] Evaluator:
   - [x] alpha equivalence: make tests independent from alpha rename strategy
-  - [ ] `alphaRename` use something else rather than `'`
-  - [ ] Bug-fix: capture introduced, see `alphaRename`
+  - [x] `alphaRename` use something else rather than `'`
+  - [x] Bug-fix: capture introduced, see `alphaRename`
   - [ ] resolve duplicated tests for capture avoidance
+  - [ ] remove excess of different var names on tests, mainly `x'`, `y'`...
 - [ ] IO-Webpage
   - [x] dropdown info about lambda calculus and b reduction strategies..
   - [ ] responsive and pretty
