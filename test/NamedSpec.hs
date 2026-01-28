@@ -8,34 +8,37 @@ spec :: Spec
 spec = do
   describe "substitute" $ do
     it "substitutes a matching variable" $ do
-      substitute x (Var x) (Var y) `shouldBe` Var y
+      shouldAlphaEq (substitute x (Var x) (Var y))
+                            (Var y)
 
     it "leaves a non-matching variable unchanged" $ do
-      substitute x (Var y) (Var z) `shouldBe` Var y
+      shouldAlphaEq (substitute x (Var y) (Var z))
+                            (Var y)
 
     it "substitutes in the left side of an application" $ do
-      substitute x (App (Var x) (Var y)) (Var z)
-        `shouldBe` App (Var z) (Var y)
+      shouldAlphaEq (substitute x (App (Var x) (Var y)) (Var z))
+                            (App (Var z) (Var y))
 
     it "substitutes in the right side of an application" $ do
-      substitute x (App (Var y) (Var x)) (Var z)
-        `shouldBe` App (Var y) (Var z)
+      shouldAlphaEq (substitute x (App (Var y) (Var x)) (Var z))
+                            (App (Var y) (Var z))
 
     it "substitutes in both sides of an application" $ do
-      substitute x (App (Var x) (Var x)) (Var y)
-        `shouldBe` App (Var y) (Var y)
+      shouldAlphaEq (substitute x (App (Var x) (Var x)) (Var y))
+                            (App (Var y) (Var y))
 
     it "does not substitute under a lambda that binds the same variable" $ do
-      substitute x (Lam x (Var x)) (Var y)
-        `shouldBe` Lam x (Var x)
+      shouldAlphaEq (substitute x (Lam x (Var x)) (Var y))
+                            (Lam x (Var x))
 
     it "substitutes under a lambda that binds a different variable" $ do
-      substitute x (Lam y (Var x)) (Var z)
-        `shouldBe` Lam y (Var z)
+      shouldAlphaEq (substitute x (Lam y (Var x)) (Var z))
+                            (Lam y (Var z))
 
     it "substitutes a complex expression" $ do
       let free = App (Var y) (Var z)
-      substitute x (Var x) free `shouldBe` free
+      shouldAlphaEq (substitute x (Var x) free)
+                            (free)
 
     it "avoids variable capture" $ do
       -- (λy. x)[x := y] should become (λz. y), not (λy. y)
@@ -43,7 +46,7 @@ spec = do
       let result = substitute x (Lam y (Var x)) (Var y)
           Lam freshVar body = result
       -- The body should be the substituted free variable y, not the bound variable
-      body `shouldBe` Var y
+      shouldAlphaEq body (Var y)
       -- The fresh variable should be different from y to avoid capture
       freshVar `shouldNotBe` y
 
@@ -57,7 +60,7 @@ spec = do
           free = Var y'
           result = substitute x body free
       -- Should be: λy. (λy''. y')
-      result `shouldBe` Lam y (Lam y'' (Var y'))
+      shouldAlphaEq result $ Lam y (Lam y'' (Var y'))
 
     it "avoids capture when the chosen fresh name already appears free in the body (regression)" $ do
       -- This exposes the bug where alphaRename always chooses v' even if v' is
@@ -69,7 +72,7 @@ spec = do
       let body = Lam y (App (Var x) (Var y'))
           result = substitute x body (Var y)
 
-      result `shouldBe` Lam y'' (App (Var y) (Var y'))
+      shouldAlphaEq result $ Lam y'' (App (Var y) (Var y'))
       isFreeIn y' result `shouldBe` True
 
   describe "alphaRename" $ do

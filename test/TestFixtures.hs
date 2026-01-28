@@ -1,7 +1,7 @@
 module TestFixtures where
 
 import           Named
-import           Test.Hspec (Expectation, shouldBe)
+import           Test.Hspec (Expectation, expectationFailure, shouldBe)
 
 -- Common variables
 f, w, x, x', y, z, a, b, y', y''  :: Var
@@ -46,3 +46,9 @@ shouldAlphaEq actual expected =
 shouldNotAlphaEq :: Expr -> Expr -> Expectation
 shouldNotAlphaEq actual expected =
   alphaEq actual expected `shouldBe` False
+
+shouldAlphaEqJust :: Maybe Expr -> Maybe Expr -> Expectation
+shouldAlphaEqJust actual expected =
+  case liftA2 shouldAlphaEq actual expected of
+    Nothing -> expectationFailure "Expected Just _, got Nothing"
+    Just r  -> r
