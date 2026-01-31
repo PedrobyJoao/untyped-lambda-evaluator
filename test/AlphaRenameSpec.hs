@@ -7,7 +7,6 @@ import           TestFixtures
 spec :: Spec
 spec = do
   describe "substitute" $ do
-    -- TODO: assert the trace on the capture avoidance scenarios
     let substituteNoTrace binder body arg = fst (substitute binder body arg)
 
     it "substitutes a matching variable" $ do
@@ -52,14 +51,18 @@ spec = do
                             (free)
 
     it "avoids variable capture" $ do
-      -- (λy. x)[x := y] should become (λz. y), not (λy. y)
+      -- (λy. x)[x := y] should become (λy'. y), not (λy. y)
       -- The bound variable y must be renamed to avoid capturing the free y
       let (result, ars) = substitute x
                             (Lam y (Var x))
                             (Var y)
 
       shouldAlphaEq result (Lam z (Var y))
-      ars `shouldSatisfy` (not . null)
+      length ars `shouldBe` 1
+
+      let [ar] = ars
+      shouldAlphaEq (beforeLambda ar) (Lam y (Var x))
+      shouldAlphaEq (afterLambda ar) (Lam z (Var x))
 
     it "does not rename a binder unnecessarily when the replacement contains its own binder (no capture risk)" $ do
       -- Substitute x := (λy.y) into (λy. x)
@@ -84,12 +87,16 @@ spec = do
       -- so the implementation must skip it.
       let x1 = nextVar x
           body = Lam x (Lam x1 (App (Var x) (Var y)))
-          result = substituteNoTrace y body (Var x)
+          (result, ars) = substitute y body (Var x)
 
       -- We don't assert the exact fresh binder chosen; we assert the meaning/structure:
-      -- the first argument in the App must refer to the *outer* binder (DBBound 1),
-      -- not the inner binder (DBBound 0).
+      -- the first argument in the App must refer to the *outer* binder, not the inner binder.
       shouldAlphaEq result (Lam z (Lam x1 (App (Var z) (Var x))))
+      length ars `shouldBe` 1
+
+      let [ar] = ars
+      shouldAlphaEq (beforeLambda ar) (Lam x (Lam x1 (App (Var x) (Var y))))
+      shouldAlphaEq (afterLambda ar) (Lam z (Lam x1 (App (Var z) (Var y))))
 
   describe "alphaRename" $ do
     it "renames the bound variable in a simple lambda" $ do
