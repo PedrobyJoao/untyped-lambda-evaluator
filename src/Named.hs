@@ -12,28 +12,6 @@ newtype Var = MkVar String
 data BetaReduction = Applicative | NormalOrder | CallByName
   deriving (Show, Eq)
 
-instance Show Expr where
-  show (Var v)     = show v
-  show (Lam v e) = "\\" ++ show v ++ "." ++ show e
-  show (App e1 e2)
-    -- Var Var = a b
-    -- Var Lam = a (\x.x)
-    -- Var App = a (b c)
-    | (Var _) <- e1, (Var _) <- e2 = show e1 ++ " " ++ show e2
-    | (Var _) <- e1 = show e1 ++ parens(show e2)
-    -- Lam Var = (λx.x) b
-    -- Lam Lam = (\x.x) (\y.y)
-    -- Lam App = (\x.x) (b c)
-    -- App Var = (a b) c
-    -- App Lam = (a b) (\x.x)
-    -- App App = (a b) (c d)
-    | (Var _) <- e2 = parens(show e1) ++ show e2
-    | otherwise = parens(show e1) ++ parens(show e2)
-      where parens e = "(" ++ e ++ ")"
-
-instance Show Var where
-  show (MkVar v) = v
-
 
 eval :: BetaReduction -> Expr -> Expr
 eval br expr = go expr
@@ -237,3 +215,29 @@ toDB = go []
 -- alpha equivalence: compare two expressions modulo renaming of bound variables.
 alphaEq :: Expr -> Expr -> Bool
 alphaEq e1 e2 = toDB e1 == toDB e2
+
+-- =========================
+-- Printing
+-- =========================
+
+instance Show Expr where
+  show (Var v)     = show v
+  show (Lam v e) = "\\" ++ show v ++ "." ++ show e
+  show (App e1 e2)
+    -- Var Var = a b
+    -- Var Lam = a (\x.x)
+    -- Var App = a (b c)
+    | (Var _) <- e1, (Var _) <- e2 = show e1 ++ " " ++ show e2
+    | (Var _) <- e1 = show e1 ++ parens(show e2)
+    -- Lam Var = (λx.x) b
+    -- Lam Lam = (\x.x) (\y.y)
+    -- Lam App = (\x.x) (b c)
+    -- App Var = (a b) c
+    -- App Lam = (a b) (\x.x)
+    -- App App = (a b) (c d)
+    | (Var _) <- e2 = parens(show e1) ++ show e2
+    | otherwise = parens(show e1) ++ parens(show e2)
+      where parens e = "(" ++ e ++ ")"
+
+instance Show Var where
+  show (MkVar v) = v
