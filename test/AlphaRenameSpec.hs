@@ -7,6 +7,7 @@ import           TestFixtures
 spec :: Spec
 spec = do
   describe "substitute" $ do
+    -- TODO: assert the trace on the capture avoidance scenarios
     let substituteNoTrace binder body arg = fst (substitute binder body arg)
 
     it "substitutes a matching variable" $ do

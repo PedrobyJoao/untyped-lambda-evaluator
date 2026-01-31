@@ -47,6 +47,7 @@ test-suite lambda-calculus-test
         FullBetaRSpec
         AlphaEqSpec
         ParserSpec
+        EvalWithTraceSpec
         TestFixtures
     hs-source-dirs:   test
     build-depends:
