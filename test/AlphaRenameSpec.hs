@@ -7,62 +7,65 @@ import           TestFixtures
 spec :: Spec
 spec = do
   describe "substitute" $ do
+    let substituteNoTrace binder body arg = fst (substitute binder body arg)
+
     it "substitutes a matching variable" $ do
-      shouldAlphaEq (substitute x (Var x)
+      shouldAlphaEq (substituteNoTrace x (Var x)
                             (Var y))
                             (Var y)
 
     it "leaves a non-matching variable unchanged" $ do
-      shouldAlphaEq (substitute x (Var y)
+      shouldAlphaEq (substituteNoTrace x (Var y)
                             (Var z))
                             (Var y)
 
     it "substitutes in the left side of an application" $ do
-      shouldAlphaEq (substitute x (App (Var x) (Var y))
+      shouldAlphaEq (substituteNoTrace x (App (Var x) (Var y))
                             (Var z))
                             (App (Var z) (Var y))
 
     it "substitutes in the right side of an application" $ do
-      shouldAlphaEq (substitute x (App (Var y) (Var x))
+      shouldAlphaEq (substituteNoTrace x (App (Var y) (Var x))
                             (Var z))
                             (App (Var y) (Var z))
 
     it "substitutes in both sides of an application" $ do
-      shouldAlphaEq (substitute x (App (Var x) (Var x))
+      shouldAlphaEq (substituteNoTrace x (App (Var x) (Var x))
                             (Var y))
                             (App (Var y) (Var y))
 
     it "does not substitute under a lambda that binds the same variable" $ do
-      shouldAlphaEq (substitute x (Lam x (Var x))
+      shouldAlphaEq (substituteNoTrace x (Lam x (Var x))
                             (Var y))
                             (Lam x (Var x))
 
     it "substitutes under a lambda that binds a different variable" $ do
-      shouldAlphaEq (substitute x (Lam y (Var x))
+      shouldAlphaEq (substituteNoTrace x (Lam y (Var x))
                             (Var z))
                             (Lam y (Var z))
 
     it "substitutes a complex expression" $ do
       let free = App (Var y) (Var z)
-      shouldAlphaEq (substitute x (Var x)
+      shouldAlphaEq (substituteNoTrace x (Var x)
                             free)
                             (free)
 
     it "avoids variable capture" $ do
       -- (λy. x)[x := y] should become (λz. y), not (λy. y)
       -- The bound variable y must be renamed to avoid capturing the free y
-      let result = substitute x
-                        (Lam y (Var x))
-                        (Var y)
+      let (result, ars) = substitute x
+                            (Lam y (Var x))
+                            (Var y)
 
       shouldAlphaEq result (Lam z (Var y))
+      ars `shouldSatisfy` (not . null)
 
     it "does not rename a binder unnecessarily when the replacement contains its own binder (no capture risk)" $ do
       -- Substitute x := (λy.y) into (λy. x)
       -- The y inside the replacement is bound, so it is NOT free in the argument,
       -- therefore the outer binder λy should NOT be renamed.
       let replacement = Lam y (Var y)
-          result = substitute x (Lam y (Var x)) replacement
+          result = substituteNoTrace x (Lam y (Var x)) replacement
 
       shouldAlphaEq result (Lam y replacement)
 
@@ -80,7 +83,7 @@ spec = do
       -- so the implementation must skip it.
       let x1 = nextVar x
           body = Lam x (Lam x1 (App (Var x) (Var y)))
-          result = substitute y body (Var x)
+          result = substituteNoTrace y body (Var x)
 
       -- We don't assert the exact fresh binder chosen; we assert the meaning/structure:
       -- the first argument in the App must refer to the *outer* binder (DBBound 1),

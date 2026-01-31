@@ -73,6 +73,8 @@ spec = do
       boundVar `shouldNotBe` y
 
   describe "callByName (single step reduction)" $ do
+    let callByNameNoTrace = fmap fst . callByName
+
     it "reduces leftmost redex first" $ do
       -- (λx.x) y ((λz.z) w)
       -- Two redexes: (λx.x) y and (λz.z) w
@@ -80,7 +82,7 @@ spec = do
       let leftRedex = App (Lam x (Var x)) (Var y)
           rightRedex = App (Lam z (Var z)) (Var w)
           expr = App leftRedex rightRedex
-      shouldAlphaEqJust (callByName expr)
+      shouldAlphaEqJust (callByNameNoTrace expr)
                         (Just (App (Var y) rightRedex))
 
     it "reduces outermost redex before inner redex" $ do
@@ -90,7 +92,7 @@ spec = do
       -- Should substitute first (outermost), giving ((λy.y) z)
       let innerRedex = App (Lam y (Var y)) (Var z)
           expr = App (Lam x (Var x)) innerRedex
-      shouldAlphaEqJust (callByName expr)
+      shouldAlphaEqJust (callByNameNoTrace expr)
                         (Just innerRedex)
 
     it "reduces in function position through multiple layers" $ do
@@ -98,5 +100,5 @@ spec = do
       -- First step: reduce (λx.λy.y) a → λy.y
       -- Result: (λy.y) b
       let expr = App (App (Lam x (Lam y (Var y))) (Var a)) (Var b)
-      shouldAlphaEqJust (callByName expr)
+      shouldAlphaEqJust (callByNameNoTrace expr)
                         (Just (App (Lam y (Var y)) (Var b)))

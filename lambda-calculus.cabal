@@ -16,6 +16,8 @@ library
     -- other-extensions:
     build-depends:    base ^>=4.20.2.0,
                       megaparsec,
+                      mtl,
+                      dlist
     hs-source-dirs:   src
 
 executable lambda-calculus

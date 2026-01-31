@@ -1,7 +1,9 @@
 module Named where
 
-import           Data.Char (isDigit)
-import           Data.List (elemIndex)
+import           Control.Monad.Writer.Strict
+import           Data.Char                   (isDigit)
+import qualified Data.DList                  as DL
+import           Data.List                   (elemIndex)
 
 data Expr = Var Var | App Expr Expr | Lam Var Expr
   deriving (Eq)
@@ -12,13 +14,47 @@ newtype Var = MkVar String
 data BetaReduction = Applicative | NormalOrder | CallByName
   deriving (Show, Eq)
 
+data Trace = Trace [Step]
+  deriving (Eq, Show)
+
+data Step = Step
+  { before         :: !Expr
+  , after          :: !Expr
+  , betaReduction  :: !BetaReduction
+  , alphaRenamings :: ![AlphaRenaming]
+  }
+  deriving (Eq, Show)
+
+data AlphaRenaming = AlphaRenaming
+  { prevBinder   :: !Var
+  , newBinderVar :: !Var
+  , beforeLambda :: !Expr
+  , afterLambda  :: !Expr
+  }
+  deriving (Eq, Show)
 
 eval :: BetaReduction -> Expr -> Expr
-eval br expr = go expr
-  where go e = maybe e go (reduce e)
-        reduce = reduceFn br
+eval br expr = fst $ evalWithTrace br expr
 
-reduceFn :: BetaReduction -> (Expr -> Maybe Expr)
+evalWithTrace :: BetaReduction -> Expr -> (Expr, Trace)
+evalWithTrace br expr = (finalExpr, Trace (reverse stepsRev))
+  where
+    reduce = reduceFn br
+    (finalExpr, stepsRev) = go expr []
+    go :: Expr -> [Step] -> (Expr, [Step])
+    go e acc = case reduce e of
+      Nothing -> (e, acc)
+      Just (e', ars) ->
+        let step =
+              Step
+                { before = e
+                , after = e'
+                , betaReduction = br
+                , alphaRenamings = ars
+                }
+        in go e' (step : acc)
+
+reduceFn :: BetaReduction -> (Expr -> Maybe (Expr, [AlphaRenaming]))
 reduceFn CallByName  = callByName
 reduceFn Applicative = applicative
 reduceFn NormalOrder = normalOrder
@@ -34,12 +70,14 @@ reduceFn NormalOrder = normalOrder
 --
 -- `(\x.x b) ((\y.y) a)`
 -- 1 step: `(\x.x b) a`
-applicative :: Expr -> Maybe Expr
-applicative (Var _)   = Nothing
-applicative (Lam v e) = Lam v  <$> applicative e
+applicative :: Expr -> Maybe (Expr, [AlphaRenaming])
+applicative (Var _) = Nothing
+applicative (Lam v e) = do
+  (e', ars) <- applicative e
+  Just (Lam v e', ars)
 applicative (App e1 e2)
-  | Just e2' <- applicative e2 = Just $ App e1 e2'
-  | Just e1' <- applicative e1 = Just $ App e1' e2
+  | Just (e2', ars) <- applicative e2 = Just (App e1 e2', ars)
+  | Just (e1', ars) <- applicative e1 = Just (App e1' e2, ars)
   | Lam v body <- e1 = Just $ substitute v body e2
   | otherwise = Nothing
 
@@ -51,13 +89,15 @@ applicative (App e1 e2)
 --
 -- `(\x.x b) ((\y.y) a)`
 -- 1 step: `((\y.y) a) b` ...
-normalOrder :: Expr -> Maybe Expr
-normalOrder (Var _)   = Nothing
-normalOrder (Lam v b) = Lam v <$> normalOrder b
+normalOrder :: Expr -> Maybe (Expr, [AlphaRenaming])
+normalOrder (Var _) = Nothing
+normalOrder (Lam v b) = do
+  (b', ars) <- normalOrder b
+  Just (Lam v b', ars)
 normalOrder (App e1 e2)
   | Lam v b <- e1 = Just $ substitute v b e2
-  | Just e1' <- normalOrder e1 = Just $ App e1' e2
-  | Just e2' <- normalOrder e2 = Just $ App e1 e2'
+  | Just (e1', ars) <- normalOrder e1 = Just (App e1' e2, ars)
+  | Just (e2', ars) <- normalOrder e2 = Just (App e1 e2', ars)
   | otherwise = Nothing
 
 -- * Call by name *
@@ -67,12 +107,12 @@ normalOrder (App e1 e2)
 -- reducing them.
 --
 -- Expressions within the lambda term are not reduced.
-callByName :: Expr -> Maybe Expr
-callByName (Var _)   = Nothing
+callByName :: Expr -> Maybe (Expr, [AlphaRenaming])
+callByName (Var _) = Nothing
 callByName (Lam _ _) = Nothing
 callByName (App e1 e2) = case e1 of
   Var _   -> Nothing
-  App _ _ -> (\e1' -> App e1' e2) <$> callByName e1
+  App _ _ -> (\(e1', ars) -> (App e1' e2, ars)) <$> callByName e1
   Lam v e -> Just $ substitute v e e2
 
 -- =========================
@@ -105,16 +145,28 @@ callByName (App e1 e2) = case e1 of
 --
 -- 2. There are occurrencens of `x` in the body at all. Otherwise, we don't need to
 -- rename anything if nothing will be replaced.
-substitute :: Var -> Expr -> Expr -> Expr
-substitute binder body arg = case body of
-  (Var v)     -> if binder == v then arg else body
-  (App e1 e2) -> App (substitute binder e1 arg) (substitute binder e2 arg)
-  (Lam v e)
-    | binder == v -> Lam v e -- different scope for the same var name, don't try to substitute
-    | isFreeIn v arg && isFreeIn binder e ->
-        let newV = fetchFreshVar v e arg
-        in substitute binder (alphaRename newV body) arg
-    | otherwise -> Lam v (substitute binder e arg)
+substitute :: Var -> Expr -> Expr -> (Expr, [AlphaRenaming])
+substitute binder body arg =
+  let (e, logDL) = runWriter (go body)
+  in (e, DL.toList logDL)
+  where
+    go :: Expr -> Writer (DL.DList AlphaRenaming) Expr
+    go b = case b of
+      Var v -> pure $ if binder == v then arg else b
+      App e1 e2 -> App <$> go e1 <*> go e2
+      lam@(Lam v lamBody)
+        | binder == v -> pure lam -- new binder context with same name, skip
+        | isFreeIn v arg && isFreeIn binder lamBody -> do
+            let newV = fetchFreshVar v lamBody arg
+                renamedLam = alphaRename newV lam
+            tell $ DL.singleton AlphaRenaming
+              { prevBinder = v
+              , newBinderVar = newV
+              , beforeLambda = lam
+              , afterLambda = renamedLam
+              }
+            go renamedLam
+        | otherwise -> Lam v <$> go lamBody
 
 -- Choose a fresh variable name for alpha-renaming a binder `oldBinder` in `body`,
 -- with respect to a substitution argument `arg`.
@@ -130,7 +182,7 @@ fetchFreshVar oldBinder body arg = go (nextVar oldBinder)
     go candidate
       | occursAnywhere candidate body = go (nextVar candidate)
       | isFreeIn candidate arg        = go (nextVar candidate)
-      | otherwise                    = candidate
+      | otherwise                     = candidate
 
 -- Given (λx.<expr>), rename all occurrences of `x`, including the bound var,
 -- using the *provided* new binder variable.
@@ -153,8 +205,9 @@ isFreeIn :: Var -> Expr -> Bool
 isFreeIn binder expr = case expr of
   (Var v) -> binder == v
   (App e1 e2) -> isFreeIn binder e1 || isFreeIn binder e2
-  (Lam innerBinder e) -> if innerBinder == binder then False
-                           else isFreeIn binder e
+  (Lam innerBinder e) ->
+    if innerBinder == binder then False
+    else isFreeIn binder e
 
 -- true if the variable name appears anywhere (free OR as a binder)
 occursAnywhere :: Var -> Expr -> Bool
@@ -228,15 +281,15 @@ instance Show Expr where
     -- Var Lam = a (\x.x)
     -- Var App = a (b c)
     | (Var _) <- e1, (Var _) <- e2 = show e1 ++ " " ++ show e2
-    | (Var _) <- e1 = show e1 ++ parens(show e2)
+    | (Var _) <- e1 = show e1 ++ parens (show e2)
     -- Lam Var = (λx.x) b
     -- Lam Lam = (\x.x) (\y.y)
     -- Lam App = (\x.x) (b c)
     -- App Var = (a b) c
     -- App Lam = (a b) (\x.x)
     -- App App = (a b) (c d)
-    | (Var _) <- e2 = parens(show e1) ++ show e2
-    | otherwise = parens(show e1) ++ parens(show e2)
+    | (Var _) <- e2 = parens (show e1) ++ show e2
+    | otherwise = parens (show e1) ++ parens (show e2)
       where parens e = "(" ++ e ++ ")"
 
 instance Show Var where
