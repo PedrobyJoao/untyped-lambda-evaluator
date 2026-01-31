@@ -57,6 +57,15 @@ spec = do
 
       shouldAlphaEq result (Lam z (Var y))
 
+    it "does not rename a binder unnecessarily when the replacement contains its own binder (no capture risk)" $ do
+      -- Substitute x := (λy.y) into (λy. x)
+      -- The y inside the replacement is bound, so it is NOT free in the argument,
+      -- therefore the outer binder λy should NOT be renamed.
+      let replacement = Lam y (Var y)
+          result = substitute x (Lam y (Var x)) replacement
+
+      shouldAlphaEq result (Lam y replacement)
+
     it "avoids variable capture when the would-be fresh name already exists as an inner binder (regression)" $ do
       -- This is the scenario described by:
       --   \x. (\x_1. x)

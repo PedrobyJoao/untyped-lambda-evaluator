@@ -81,6 +81,11 @@ spec = do
         (App (App (Lam x (Lam y (App (Var x) (Var y)))) (Lam z (Var z))) (Var a))
         (Var a)
 
+    describe "Reduction under lambda abstraction (full normalization)" $ do
+      testFullBetaReductions "λx.(I x) = λx.x"
+        (Lam x (App identityI (Var x)))
+        (Lam x (Var x))
+
     describe "Already reduced expressions" $ do
       testFullBetaReductions "Variable stays as variable"
         (Var x)
