@@ -2,13 +2,16 @@
 
 module Main (main) where
 
+import           Control.Monad.IO.Class        (liftIO)
 import qualified Data.Text.Lazy                as TL
-import           Named                         (BetaReduction (..), eval)
+import           Named                         (BetaReduction (..), ElapsedNs,
+                                                evalWithStatistics)
 import           Network.Wai.Middleware.Static (Policy, hasPrefix,
                                                 isNotAbsolute, noDots,
                                                 staticPolicy, (>->))
 import           Parser                        (parseStr)
 import           Text.Megaparsec               (errorBundlePretty)
+import           Text.Printf                   (printf)
 import           Web.Scotty                    (ActionM, file, formParam, get,
                                                 html, middleware, post, scotty)
 
@@ -31,11 +34,17 @@ main = scotty 3000 $ do
           Left parseErr ->
             html $ renderOutputOnly (TL.pack (errorBundlePretty parseErr))
           Right parsedExpr -> do
-            let result = eval strategy parsedExpr
+            (result, _trace, elapsedNs) <- liftIO $ evalWithStatistics strategy parsedExpr
             html $
               renderOutputAndStats
                 (TL.pack (show result))
-                ("<em>No statistics yet.</em>")
+                (renderStats elapsedNs)
+
+renderStats :: ElapsedNs -> TL.Text
+renderStats ns =
+  let ms :: Double
+      ms = fromIntegral ns / 1e6
+  in TL.pack (printf "Elapsed: %.3f ms (%d ns)" ms ns)
 
 parseStrategy :: TL.Text -> Either TL.Text BetaReduction
 parseStrategy t =

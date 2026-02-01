@@ -1,21 +1,31 @@
+{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveGeneric #-}
+
 module Named where
 
+import           Control.DeepSeq             (NFData, force)
+import           Control.Exception           (evaluate)
 import           Control.Monad.Writer.Strict
 import           Data.Char                   (isDigit)
 import qualified Data.DList                  as DL
 import           Data.List                   (elemIndex)
+import           Data.Word                   (Word64)
+import           GHC.Clock                   (getMonotonicTimeNSec)
+import           GHC.Generics                (Generic)
+
+type ElapsedNs = Word64
 
 data Expr = Var Var | App Expr Expr | Lam Var Expr
-  deriving (Eq)
+  deriving (Eq, Generic, NFData)
 
 newtype Var = MkVar String
-  deriving (Eq)
+  deriving (Eq, Generic, NFData)
 
 data BetaReduction = Applicative | NormalOrder | CallByName
-  deriving (Show, Eq)
+  deriving (Show, Eq, Generic, NFData)
 
 data Trace = Trace [Step]
-  deriving (Eq, Show)
+  deriving (Eq, Show, Generic, NFData)
 
 data Step = Step
   { before         :: !Expr
@@ -23,7 +33,7 @@ data Step = Step
   , betaReduction  :: !BetaReduction
   , alphaRenamings :: ![AlphaRenaming]
   }
-  deriving (Eq, Show)
+  deriving (Eq, Show, Generic, NFData)
 
 data AlphaRenaming = AlphaRenaming
   { prevBinder   :: !Var
@@ -31,7 +41,7 @@ data AlphaRenaming = AlphaRenaming
   , beforeLambda :: !Expr
   , afterLambda  :: !Expr
   }
-  deriving (Eq, Show)
+  deriving (Eq, Show, Generic, NFData)
 
 eval :: BetaReduction -> Expr -> Expr
 eval br expr = fst $ evalWithTrace br expr
@@ -53,6 +63,15 @@ evalWithTrace br expr = (finalExpr, Trace (reverse stepsRev))
                 , alphaRenamings = ars
                 }
         in go e' (step : acc)
+
+-- Runs evalWithTrace, forces the result, and measures elapsed time using a monotonic clock.
+evalWithStatistics :: BetaReduction -> Expr -> IO (Expr, Trace, ElapsedNs)
+evalWithStatistics br expr = do
+  t0 <- getMonotonicTimeNSec
+  let res@(e, tr) = evalWithTrace br expr
+  _ <- evaluate (force res)
+  t1 <- getMonotonicTimeNSec
+  pure (e, tr, t1 - t0)
 
 reduceFn :: BetaReduction -> (Expr -> Maybe (Expr, [AlphaRenaming]))
 reduceFn CallByName  = callByName
@@ -248,7 +267,7 @@ data DB
   | DBBound Int
   | DBApp DB DB
   | DBLam DB
-  deriving (Eq, Show)
+  deriving (Eq, Show, Generic, NFData)
 
 -- Convert a named expression to De Bruijn indices.
 -- Bound variables become DBBound n, where n=0 refers to the nearest lambda binder.
