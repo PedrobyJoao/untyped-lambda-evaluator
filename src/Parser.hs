@@ -1,10 +1,14 @@
-module Parser (parseStr) where
+module Parser (parseExprStr) where
 
 import           Data.Void                  (Void)
 import           Named
 import           Text.Megaparsec
 import           Text.Megaparsec.Char
 import qualified Text.Megaparsec.Char.Lexer as L
+
+-- ====================
+-- Parsing Lambda expressions
+-- ====================
 
 -- Megaparsec uses a topdown approach so the solution can not
 -- rely on left-recursive parsing. Thus, the strategy of parsing
@@ -59,8 +63,12 @@ expr = try lam <|> try app
 parseExpr :: Parser Expr
 parseExpr = space *> expr <* eof
 
-parseStr :: String -> Either (ParseErrorBundle String Void) Expr
-parseStr = parse parseExpr ""
+parseExprStr :: String -> Either (ParseErrorBundle String Void) Expr
+parseExprStr = parse parseExpr ""
+
+-- ====================
+-- Lexemes
+-- ====================
 
 symbol :: String -> Parser String
 symbol = L.symbol sc

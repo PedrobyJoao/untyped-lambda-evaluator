@@ -1,7 +1,7 @@
 module ParserSpec (spec) where
 
 import           Named        (Expr (..), Var (..))
-import           Parser       (parseStr)
+import           Parser       (parseExprStr)
 import           Test.Hspec
 import           TestFixtures
 
@@ -94,12 +94,12 @@ spec = do
 
 expectParse :: String -> Expr -> Expectation
 expectParse s expected =
-  case parseStr s of
+  case parseExprStr s of
     Left err     -> expectationFailure (show err)
     Right actual -> actual `shouldBe` expected
 
 expectFail :: String -> Expectation
 expectFail s =
-  case parseStr s of
+  case parseExprStr s of
     Left _ -> pure ()
     Right actual -> expectationFailure ("Expected parse failure, but succeeded with: " ++ show actual)

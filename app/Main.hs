@@ -9,7 +9,7 @@ import           Named                         (BetaReduction (..), ElapsedNs,
 import           Network.Wai.Middleware.Static (Policy, hasPrefix,
                                                 isNotAbsolute, noDots,
                                                 staticPolicy, (>->))
-import           Parser                        (parseStr)
+import           Parser                        (parseExprStr)
 import           Text.Megaparsec               (errorBundlePretty)
 import           Text.Printf                   (printf)
 import           Web.Scotty                    (ActionM, file, formParam, get,
@@ -30,7 +30,7 @@ main = scotty 3000 $ do
       Left stratErr ->
         html $ renderOutputOnly stratErr
       Right strategy ->
-        case parseStr (TL.unpack exprTxt) of
+        case parseExprStr (TL.unpack exprTxt) of
           Left parseErr ->
             html $ renderOutputOnly (TL.pack (errorBundlePretty parseErr))
           Right parsedExpr -> do
