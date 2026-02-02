@@ -18,7 +18,8 @@ library
                       megaparsec,
                       mtl,
                       dlist,
-                      deepseq
+                      deepseq,
+                      containers
     hs-source-dirs:   src
 
 executable lambda-calculus

@@ -1,5 +1,5 @@
 {-# LANGUAGE DeriveAnyClass #-}
-{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DeriveGeneric  #-}
 
 module Named where
 
@@ -9,6 +9,7 @@ import           Control.Monad.Writer.Strict
 import           Data.Char                   (isDigit)
 import qualified Data.DList                  as DL
 import           Data.List                   (elemIndex)
+import qualified Data.Set                    as S
 import           Data.Word                   (Word64)
 import           GHC.Clock                   (getMonotonicTimeNSec)
 import           GHC.Generics                (Generic)
@@ -19,7 +20,7 @@ data Expr = Var Var | App Expr Expr | Lam Var Expr
   deriving (Eq, Generic, NFData)
 
 newtype Var = MkVar String
-  deriving (Eq, Generic, NFData)
+  deriving (Eq, Ord, Generic, NFData)
 
 data BetaReduction = Applicative | NormalOrder | CallByName
   deriving (Show, Eq, Generic, NFData)
@@ -294,7 +295,7 @@ alphaEq e1 e2 = toDB e1 == toDB e2
 
 instance Show Expr where
   show (Var v)     = show v
-  show (Lam v e) = "\\" ++ show v ++ "." ++ show e
+  show (Lam v e) = "\\" ++ show v ++ ". " ++ show e
   show (App e1 e2)
     -- Var Var = a b
     -- Var Lam = a (\x.x)
@@ -313,3 +314,18 @@ instance Show Expr where
 
 instance Show Var where
   show (MkVar v) = v
+
+
+-- =========================
+-- Helpers
+-- =========================
+
+-- todo: tests
+freeVars :: Expr -> S.Set Var
+freeVars = go S.empty
+  where
+    go :: S.Set Var -> Expr -> S.Set Var
+    go bound e = case e of
+      Var v      -> if v `S.member` bound then S.empty else S.singleton v
+      App e1 e2  -> go bound e1 `S.union` go bound e2
+      Lam v body -> go (S.insert v bound) body

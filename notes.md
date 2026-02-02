@@ -23,11 +23,19 @@ with the cases which applicative does not terminate): applicative and normal ord
 
 Weakly normalizing (Call by x) strategies are not confluent.
 
-## Alpha-renaming
+## Alpha renaming:
 
-# Sources:
+### Capture Avoidance
 
-- https://personal.utdallas.edu/~gupta/courses/apl/lambda.pdf
-- https://en.wikipedia.org/wiki/Lambda_calculus
-- https://www.cs.bu.edu/fac/snyder/cs320/Lectures/Lecture15--%20Lambda%20Calculus%20II.pdf
-- https://opendsa.cs.vt.edu/ODSA/Books/PL/html/ReductionStrategies.html
+(\x. (\y. x)) y
+
+### Var capture being introduced
+
+(\x. (\x_1. x)) x
+
+## Challenges:
+
+## Parser: equational reference
+
+- Not allowed: recursive def such as fibo
+- Not allowed: mutual recursive definition (odd and even)

@@ -11,15 +11,16 @@
   - [ ] remove excess of different var names on tests, mainly `x'`, `y'`...
   - [x] trace reductions
   - [x] eval time
-  - [ ] trace redexes
 - [ ] IO-Webpage
   - [x] dropdown info about lambda calculus and b reduction strategies..
   - [ ] responsive and pretty
-  - [ ] statistics: eval time
+  - [x] statistics: eval time
   - [ ] statistics: steps
   - [ ] check reliability of htmx/pico urls and versions
 - [ ] hardcoded limit to the number of steps
-- [ ] Equational reference as: let name = e1 in e2 ⟶ (\name. e2) e1
+- [x] Parser: Equational reference as: let name = e1 in e2 ⟶ (\name. e2) e1
+- [ ] Parser: pretty error return
+- [ ] deploy
 - [ ] CI/CD with tests and build
 - [ ] Extra (I may not do it):
   - [ ] Evaluator: trace redexes insted of entire steps
