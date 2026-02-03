@@ -56,5 +56,6 @@ test-suite lambda-calculus-test
         base ^>=4.20.2.0,
         hspec,
         hspec-discover,
+        megaparsec,
         lambda-calculus
     build-tool-depends: hspec-discover:hspec-discover
