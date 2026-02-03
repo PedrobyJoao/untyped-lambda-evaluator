@@ -22,15 +22,15 @@
   - [ ] statistics: steps
   - [ ] smaller font and more blackness on textarea part
   - [ ] check reliability of htmx/pico urls and versions
+- [x] refactor Main.hs, make it modular
+  - [x] e.g.: Service module (parse + eval)
 - [ ] Evaluator: hardcoded limit to the number of steps
 - [ ] UI: correct docs
   - [ ] UI: link to prelude
 - [ ] deploy
 - [ ] CI/CD with tests and build
 - [ ] README docs
-- [ ] refactor Main.hs, make it modular
-  - [ ] e.g.: Service module (parse + eval)
-  - [ ] e2e for this general module
+- [ ] e2e (parser + eval)
 - [ ] Extra (I may not do it):
   - [ ] Evaluator: trace redexes insted of entire steps
   - [ ] QA: remove excess of different var names on tests, mainly `x'`, `y'`...
@@ -41,6 +41,7 @@
   - [ ] Statistics: memory usage  
          Memory usage stats is usually process wise with Haskell tools (e.g.: GHC RTS),
         so it's only more or less reliable if we execute the eval func in a separate process.
+  - [ ] Eval: Call by value
 
 ## Learn more here:
 

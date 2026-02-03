@@ -1,9 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Interpreter
-  ( interpret
-  , resolveOutputIfReferenced
-  ) where
+module Interpreter (interpret) where
 
 import qualified Data.Map.Strict as M
 import qualified Data.Text.Lazy  as TL
@@ -15,9 +12,14 @@ import           Text.Megaparsec (errorBundlePretty)
 
 type WithPrelude = Bool
 
--- | Parse (optionally with prelude), evaluate with the given strategy,
--- and return the rendered output (possibly replaced by a referenced name)
--- along with elapsed time.
+-- | Parse a program in the form of:
+--
+-- 0 or many let bindings
+-- <final expression>
+--
+-- Evaluates it and returns the resultant expression, trace and elapsed time
+--
+-- TODO: our e2e tests
 interpret
   :: BetaReduction
   -> WithPrelude
@@ -28,6 +30,7 @@ interpret strategy withPrelude exprStr = do
   case parseFn exprStr of
     Left parseErr ->
       pure $ Left (TL.pack (errorBundlePretty parseErr))
+
     Right parsedProgram -> do
       (result, _trace, elapsedNs) <-
         evalWithStatistics strategy (parsedExpr parsedProgram)
@@ -39,10 +42,12 @@ interpret strategy withPrelude exprStr = do
 -- in the env
 -- ============
 
+-- todo: tests?
 resolveOutputIfReferenced :: Expr -> M.Map Var Expr -> TL.Text
 resolveOutputIfReferenced result env =
   TL.pack $ maybe (show result) show (referenceName result env)
 
+-- todo: tests?
 referenceName :: Expr -> M.Map Var Expr -> Maybe Var
 referenceName result env =
   M.foldrWithKey

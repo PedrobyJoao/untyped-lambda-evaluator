@@ -12,39 +12,46 @@ import           Named                         (BetaReduction (..))
 import           Network.Wai.Middleware.Static (Policy, hasPrefix,
                                                 isNotAbsolute, noDots,
                                                 staticPolicy, (>->))
-import           Web.Render                    (renderOutputAndStats,
-                                                renderOutputOnly, renderStats)
-import           Web.Scotty                    (ActionM, catch, file, formParam,
-                                                get, html, middleware, post,
-                                                scotty)
+import           Web.Render
+import           Web.Scotty                    (ActionM, ScottyM, catch, file,
+                                                formParam, get, html,
+                                                middleware, post, scotty)
 
 runApp :: IO ()
 runApp =
   scotty 3000 $ do
     middleware $ staticPolicy staticUnderPrefix
+    routes
 
-    get "/" $ do
-      file "static/index.html"
+routes :: ScottyM ()
+routes = do
+  get "/" getHome
+  post "/eval" postEval
 
-    post "/eval" $ do
-      exprTxt <- formParam "expr" :: ActionM TL.Text
-      stratTxt <- formParam "strategy" :: ActionM TL.Text
-      withPreludeTxt <- (formParam "withPrelude" :: ActionM TL.Text)
-        `catch` onMissingPrelude
+getHome :: ActionM ()
+getHome =
+  file "static/index.html"
 
-      let withPrelude = isChecked withPreludeTxt
+postEval :: ActionM ()
+postEval = do
+  exprTxt <- formParam "expr" :: ActionM TL.Text
+  stratTxt <- formParam "strategy" :: ActionM TL.Text
+  withPreludeTxt <- (formParam "withPrelude" :: ActionM TL.Text)
+    `catch` onMissingPrelude
 
-      case parseStrategy stratTxt of
-        Left stratErr ->
-          html $ renderOutputOnly stratErr
+  let withPrelude = isChecked withPreludeTxt
 
-        Right strategy -> do
-          result <- liftIO $ interpret strategy withPrelude (TL.unpack exprTxt)
-          case result of
-            Left errTxt ->
-              html $ renderOutputOnly errTxt
-            Right (outputTxt, _, elapsedNs) ->
-              html $ renderOutputAndStats outputTxt (renderStats elapsedNs)
+  case parseStrategy stratTxt of
+    Left stratErr ->
+      html $ renderOutputOnly stratErr
+
+    Right strategy -> do
+      result <- liftIO $ interpret strategy withPrelude (TL.unpack exprTxt)
+      case result of
+        Left errTxt ->
+          html $ renderOutputOnly errTxt
+        Right (outputTxt, _, elapsedNs) ->
+          html $ renderOutputAndStats outputTxt (renderStats elapsedNs)
 
 -- ============
 -- Process I/O
