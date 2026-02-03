@@ -30,10 +30,11 @@ executable lambda-calculus
     -- other-extensions:
     build-depends:
         base ^>=4.20.2.0,
+        scotty ^>=0.30,
         lambda-calculus,
-        scotty,
         text,
         megaparsec,
+        containers,
         wai,
         wai-middleware-static
 

@@ -20,10 +20,13 @@
   - [ ] check reliability of htmx/pico urls and versions
 - [ ] hardcoded limit to the number of steps
 - [x] Parser: Equational reference as: let name = e1 in e2 ⟶ (\name. e2) e1
-- [x] Parser: pretty error return tests
-- [ ] Parser: output a bind name instead of a lam expr by checking env of let bindings
-- [ ] Parser: load common combinators (be careful with conflicts if user tries to define again)
+  - [x] pretty error return tests
+  - [x] output a bind name instead of a lam expr by checking env of let bindings
+  - [x] load common combinators (be careful with conflicts if user tries to define again)
+  - [ ] tests for withPrelude (and returned env)
+  - [ ] adjust prelude (have it as a file maybe?)
 - [ ] UI: correct docs
+  - [ ] UI: link to prelude
 - [ ] deploy
 - [ ] CI/CD with tests and build
 - [ ] README docs
@@ -33,7 +36,6 @@
   - [ ] UI: run all b-red strategies and compare them
   - [ ] Evaluator: HOAS and de Bruijn index?
   - [ ] Parser: Syntax sugar for multiple args (`\x y z.`)
-  - [ ] UI: canonical representation (x, x_1, x_2...)
   - [ ] Statistics: memory usage  
          Memory usage stats is usually process wise with Haskell tools (e.g.: GHC RTS),
         so it's only more or less reliable if we execute the eval func in a separate process.

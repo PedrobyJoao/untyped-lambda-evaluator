@@ -1,7 +1,7 @@
 module ParserSpec (spec) where
 
 import           Named           (Expr (..), Var (..))
-import           Parser          (parseExprStr)
+import           Parser          (ParsedProgram (..), parseNoPrelude)
 import           Test.Hspec
 import           TestFixtures
 import           Text.Megaparsec (errorBundlePretty)
@@ -177,12 +177,13 @@ spec = do
 
 expectParse :: String -> Expr -> Expectation
 expectParse s expected =
-  case parseExprStr s of
+  case parsedExpr <$> parseNoPrelude s of
     Left err     -> expectationFailure (errorBundlePretty err)
     Right actual -> actual `shouldBe` expected
 
 expectFail :: String -> Expectation
 expectFail s =
-  case parseExprStr s of
+  case parsedExpr <$> parseNoPrelude s of
     Left _ -> pure ()
     Right actual -> expectationFailure ("Expected parse failure, but succeeded with: " ++ show actual)
+

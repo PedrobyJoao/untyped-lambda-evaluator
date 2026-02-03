@@ -102,6 +102,11 @@
 
       <article class="panel">
         <form hx-post="/eval" hx-target="#results" hx-swap="innerHTML">
+          <label>
+            <input type="checkbox" name="withPrelude" />
+            <span>Include Prelude (TODO: link to prelude envs)</span>
+          </label>
+
           <label for="expr" class="sr-only">Expression</label>
           <textarea
             id="expr"

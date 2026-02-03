@@ -1,4 +1,4 @@
-module Parser (parseExprStr) where
+module Parser (ParsedProgram(..), parseWithPrelude, parseNoPrelude) where
 
 import           Control.Monad              (void)
 import qualified Data.Map.Strict            as M
@@ -11,6 +11,11 @@ import qualified Text.Megaparsec.Char.Lexer as L
 
 type Parser = Parsec Void String
 
+data ParsedProgram = ParsedProgram
+  { parsedExpr :: Expr
+  , namings    :: M.Map Var Expr
+  }
+
 reserved :: [String]
 reserved = ["let"]
 
@@ -18,24 +23,31 @@ reserved = ["let"]
 -- Entry level
 -- ====================
 
--- TODO: error pretty
-parseExprStr :: String -> Either (ParseErrorBundle String Void) Expr
-parseExprStr = parse program ""
+-- TESTS
+parseWithPrelude :: String -> Either (ParseErrorBundle String Void) ParsedProgram
+parseWithPrelude = parseProgramWithEnv preludeEnv
+
+parseNoPrelude:: String -> Either (ParseErrorBundle String Void) ParsedProgram
+parseNoPrelude = parseProgramWithEnv M.empty
+
+-- env is a map of names to expressions (for equational referencing)
+parseProgramWithEnv :: M.Map Var Expr -> String -> Either (ParseErrorBundle String Void) ParsedProgram
+parseProgramWithEnv env0 = parse (program env0) ""
 
 -- ====================
 -- Let bindings + Final Lambda expression
 -- ====================
 
-program :: Parser Expr
-program = do
+program :: M.Map Var Expr -> Parser ParsedProgram
+program env0 = do
   binds <- many (try letBinding)
   scn
   final <- expr
   scn
   eof
-  case resolveLets binds final of
-    Left msg -> fail msg
-    Right e  -> pure e
+  case resolveLets env0 binds final of
+    Left msg          -> fail msg
+    Right (e, envOut) -> pure (ParsedProgram e envOut)
 
 -- Parse a top-level let binding:
 --   let x = <expr>\n
@@ -69,8 +81,8 @@ inlineWith env expression =
     expression
     env
 
-resolveLets :: [(Var, Expr)] -> Expr -> Either String Expr
-resolveLets binds finalExpr = do
+resolveLets :: M.Map Var Expr -> [(Var, Expr)] -> Expr -> Either String (Expr, M.Map Var Expr)
+resolveLets env0 binds finalExpr = do
   let names = S.fromList (map fst binds)
   if S.size names /= length binds
     then Left $ "Duplicate let-binding name found; Names: " ++ show (map fst binds)
@@ -98,8 +110,8 @@ resolveLets binds finalExpr = do
                            ready
                    in go env' later
 
-  env <- go M.empty pending0
-  pure (inlineWith env finalExpr)
+  env <- go env0 pending0
+  pure (inlineWith env finalExpr, env)
 
 -- ====================
 -- Parsing Lambda expressions
@@ -184,3 +196,76 @@ lexeme = L.lexeme sc
 -- ====================
 allowedVarChars :: Parser Char
 allowedVarChars = alphaNumChar <|> char '_'
+
+-- ====================
+-- Prelude
+-- ====================
+
+preludeEnv :: M.Map Var Expr
+preludeEnv =
+  M.fromList
+    [ (v "I", iComb)
+    , (v "K", kComb)
+    , (v "S", sComb)
+    , (v "B", bComb)
+    , (v "C", cComb)
+    , (v "W", wComb)
+    , (v "Y", yComb)
+    ]
+  where
+    v :: String -> Var
+    v = MkVar
+
+    varE :: String -> Expr
+    varE = Var . v
+
+    lam1 :: String -> Expr -> Expr
+    lam1 x body = Lam (v x) body
+
+    app2 :: Expr -> Expr -> Expr
+    app2 = App
+
+    app3 :: Expr -> Expr -> Expr -> Expr
+    app3 f a b = app2 (app2 f a) b
+
+    iComb :: Expr
+    iComb = lam1 "x" (varE "x")
+
+    kComb :: Expr
+    kComb = lam1 "x" (lam1 "y" (varE "x"))
+
+    sComb :: Expr
+    sComb =
+      lam1 "x" $
+        lam1 "y" $
+          lam1 "z" $
+            app2
+              (app2 (varE "x") (varE "z"))
+              (app2 (varE "y") (varE "z"))
+
+    bComb :: Expr
+    bComb =
+      lam1 "f" $
+        lam1 "g" $
+          lam1 "x" $
+            app2 (varE "f") (app2 (varE "g") (varE "x"))
+
+    cComb :: Expr
+    cComb =
+      lam1 "f" $
+        lam1 "x" $
+          lam1 "y" $
+            app3 (varE "f") (varE "y") (varE "x")
+
+    wComb :: Expr
+    wComb =
+      lam1 "f" $
+        lam1 "x" $
+          app3 (varE "f") (varE "x") (varE "x")
+
+    yComb :: Expr
+    yComb =
+      lam1 "f" $
+        app2
+          (lam1 "x" (app2 (varE "f") (app2 (varE "x") (varE "x"))))
+          (lam1 "x" (app2 (varE "f") (app2 (varE "x") (varE "x"))))
