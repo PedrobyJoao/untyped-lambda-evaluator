@@ -11,13 +11,15 @@ common cm
 library
     import:           cm
     exposed-modules:  Named,
-                      Parser
+                      Parser,
+                      Interpreter
     -- other-modules:
     -- other-extensions:
     build-depends:    base ^>=4.20.2.0,
                       megaparsec,
                       mtl,
                       dlist,
+                      text,
                       deepseq,
                       containers,
                       file-embed == 0.0.16.0
@@ -27,7 +29,9 @@ executable lambda-calculus
     import:           cm
     main-is:          Main.hs
     ghc-options: -threaded
-    -- other-modules:
+    other-modules:
+        Web.App
+        Web.Render
     -- other-extensions:
     build-depends:
         base ^>=4.20.2.0,
