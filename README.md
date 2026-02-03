@@ -16,12 +16,17 @@
   - [ ] responsive and pretty
   - [x] statistics: eval time
   - [ ] statistics: steps
+  - [ ] smaller font and more blackness on textarea part
   - [ ] check reliability of htmx/pico urls and versions
 - [ ] hardcoded limit to the number of steps
 - [x] Parser: Equational reference as: let name = e1 in e2 ⟶ (\name. e2) e1
 - [ ] Parser: pretty error return
+- [ ] Parser: output a bind name instead of a lam expr by checking env of let bindings
+- [ ] Parser: load common combinators (be careful with conflicts if user tries to define again)
+- [ ] UI: correct docs
 - [ ] deploy
 - [ ] CI/CD with tests and build
+- [ ] README docs
 - [ ] Extra (I may not do it):
   - [ ] Evaluator: trace redexes insted of entire steps
   - [ ] UI: automatically convert backslash to lambda
