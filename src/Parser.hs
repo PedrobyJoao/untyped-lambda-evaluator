@@ -1,6 +1,9 @@
-module Parser (ParsedProgram(..), parseWithPrelude, parseNoPrelude) where
+{-# LANGUAGE TemplateHaskell #-}
+
+module Parser (ParsedProgram(..), parseWithPrelude, parseNoPrelude, preludeEnvProgram) where
 
 import           Control.Monad              (void)
+import           Data.FileEmbed             (embedStringFile)
 import qualified Data.Map.Strict            as M
 import qualified Data.Set                   as S
 import           Data.Void                  (Void)
@@ -23,9 +26,8 @@ reserved = ["let"]
 -- Entry level
 -- ====================
 
--- TESTS
 parseWithPrelude :: String -> Either (ParseErrorBundle String Void) ParsedProgram
-parseWithPrelude = parseProgramWithEnv preludeEnv
+parseWithPrelude input = preludeEnvProgram >>= \env0 -> parseProgramWithEnv env0 input
 
 parseNoPrelude:: String -> Either (ParseErrorBundle String Void) ParsedProgram
 parseNoPrelude = parseProgramWithEnv M.empty
@@ -201,71 +203,8 @@ allowedVarChars = alphaNumChar <|> char '_'
 -- Prelude
 -- ====================
 
-preludeEnv :: M.Map Var Expr
-preludeEnv =
-  M.fromList
-    [ (v "I", iComb)
-    , (v "K", kComb)
-    , (v "S", sComb)
-    , (v "B", bComb)
-    , (v "C", cComb)
-    , (v "W", wComb)
-    , (v "Y", yComb)
-    ]
-  where
-    v :: String -> Var
-    v = MkVar
+preludeSource :: String
+preludeSource = $(embedStringFile "static/prelude.lam")
 
-    varE :: String -> Expr
-    varE = Var . v
-
-    lam1 :: String -> Expr -> Expr
-    lam1 x body = Lam (v x) body
-
-    app2 :: Expr -> Expr -> Expr
-    app2 = App
-
-    app3 :: Expr -> Expr -> Expr -> Expr
-    app3 f a b = app2 (app2 f a) b
-
-    iComb :: Expr
-    iComb = lam1 "x" (varE "x")
-
-    kComb :: Expr
-    kComb = lam1 "x" (lam1 "y" (varE "x"))
-
-    sComb :: Expr
-    sComb =
-      lam1 "x" $
-        lam1 "y" $
-          lam1 "z" $
-            app2
-              (app2 (varE "x") (varE "z"))
-              (app2 (varE "y") (varE "z"))
-
-    bComb :: Expr
-    bComb =
-      lam1 "f" $
-        lam1 "g" $
-          lam1 "x" $
-            app2 (varE "f") (app2 (varE "g") (varE "x"))
-
-    cComb :: Expr
-    cComb =
-      lam1 "f" $
-        lam1 "x" $
-          lam1 "y" $
-            app3 (varE "f") (varE "y") (varE "x")
-
-    wComb :: Expr
-    wComb =
-      lam1 "f" $
-        lam1 "x" $
-          app3 (varE "f") (varE "x") (varE "x")
-
-    yComb :: Expr
-    yComb =
-      lam1 "f" $
-        app2
-          (lam1 "x" (app2 (varE "f") (app2 (varE "x") (varE "x"))))
-          (lam1 "x" (app2 (varE "f") (app2 (varE "x") (varE "x"))))
+preludeEnvProgram :: Either (ParseErrorBundle String Void) (M.Map Var Expr)
+preludeEnvProgram = namings <$> parseProgramWithEnv M.empty preludeSource

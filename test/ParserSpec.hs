@@ -1,10 +1,11 @@
 module ParserSpec (spec) where
 
 import qualified Data.Map.Strict as M
+import qualified Data.Set        as S
 import           Data.Void       (Void)
 import           Named           (Expr (..), Var (..))
 import           Parser          (ParsedProgram (..), parseNoPrelude,
-                                  parseWithPrelude)
+                                  parseWithPrelude, preludeEnvProgram)
 import           Test.Hspec
 import           TestFixtures
 import           Text.Megaparsec (ParseErrorBundle, errorBundlePretty)
@@ -102,6 +103,7 @@ spec = do
   describe "Parser.Prelude" $ do
     it "loads I from the prelude" $ do
       expectParseWithPrelude "I" identityI
+      expectParseWithPrelude "id" identityI
 
     it "allows user let-bindings to shadow prelude names" $ do
       let userI = Lam z (App (Var z) (Var z))
@@ -122,8 +124,12 @@ spec = do
               ]
       withParsedProgram (parseWithPrelude input) $ \p -> do
         let env = namings p
-        env `shouldHaveKeys`
-          map MkVar ["I", "K", "S", "B", "C", "W", "Y", "a", "b"]
+            preludeKeys =
+              either (error . errorBundlePretty) M.keysSet preludeEnvProgram
+            expectedKeys =
+              preludeKeys `S.union` S.fromList [MkVar "a", MkVar "b"]
+
+        M.keysSet env `shouldBe` expectedKeys
 
     it "WithoutPrelude + let bindings: should only have let bindings" $ do
       let input =

@@ -1,0 +1,55 @@
+-- Common lambda functions / combinators
+
+let id = \x. x
+let const = \x. \y. x
+let apply = \f. \x. f x
+let compose = \f. \g. \x. f (g x)
+let flip = \f. \a. \b. f b a
+let dup = \x. x x
+
+let true    = \t. \f. t
+let false   = \t. \f. f
+
+let and     = \a. \b. a b a
+let or      = \a. \b. a a b
+let not     = \b. b false true
+let if      = \p. \a. \b. p a b
+
+let pair    = \x. \y. \f. f x y
+let cons    = \x. \y. \f. f x y
+
+
+-- Classic combinator aliases
+
+let I = id
+let K = const
+let B = compose
+let C = flip
+
+-- S combinator
+
+let S = \x. \y. \z. x z (y z)
+
+-- W combinator
+
+let W = \f. \x. f x x
+
+-- church encoding
+
+let incr    = \n. \f. \y. f (n f y)
+let plus    = \m. \n. m incr n
+let times   = \m. \n. m (plus n) zero
+let iszero  = \n. n (\y. false) true
+
+let zero    = \f. \x. x
+let one     = \f. \x. f x
+let two     = \f. \x. f (f x)
+let three   = \f. \x. f (f (f x))
+let four    = \f. \x. f (f (f (f x)))
+let five    = \f. \x. f (f (f (f (f x))))
+let six     = \f. \x. f (f (f (f (f (f x)))))
+let seven   = \f. \x. f (f (f (f (f (f (f x))))))
+let eight   = \f. \x. f (f (f (f (f (f (f (f x)))))))
+let nine    = \f. \x. f (f (f (f (f (f (f (f (f x))))))))
+
+id -- ignore: only here for this file to be parsed

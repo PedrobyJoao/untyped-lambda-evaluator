@@ -2,7 +2,7 @@ cabal-version:      3.0
 name:               lambda-calculus
 version:            0.1.0.0
 build-type:         Simple
--- extra-source-files:
+extra-source-files: static/prelude.lam
 
 common cm
     ghc-options: -Wall
@@ -19,7 +19,8 @@ library
                       mtl,
                       dlist,
                       deepseq,
-                      containers
+                      containers,
+                      file-embed == 0.0.16.0
     hs-source-dirs:   src
 
 executable lambda-calculus
