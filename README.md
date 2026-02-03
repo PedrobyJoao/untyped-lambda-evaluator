@@ -13,7 +13,6 @@
   - [x] eval time
 - [ ] IO-Webpage
   - [x] dropdown info about lambda calculus and b reduction strategies..
-  - [ ] responsive and pretty
   - [ ] statistics: eval time + number of beta reduction steps
   - [ ] statistics: steps
   - [ ] smaller font and more blackness on textarea part
@@ -23,8 +22,11 @@
   - [x] pretty error return tests
   - [x] output a bind name instead of a lam expr by checking env of let bindings
   - [x] load common combinators (be careful with conflicts if user tries to define again)
-  - [ ] tests for withPrelude (and returned env)
+  - [x] tests for withPrelude (and returned env)
   - [ ] adjust prelude (have it as a file maybe?)
+- [ ] refactor Main.hs, make it modular
+  - [ ] e.g.: Service module (parse + eval)
+  - [ ] e2e for this general module
 - [ ] UI: correct docs
   - [ ] UI: link to prelude
 - [ ] deploy

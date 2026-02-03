@@ -1,10 +1,13 @@
 module ParserSpec (spec) where
 
+import qualified Data.Map.Strict as M
+import           Data.Void       (Void)
 import           Named           (Expr (..), Var (..))
-import           Parser          (ParsedProgram (..), parseNoPrelude)
+import           Parser          (ParsedProgram (..), parseNoPrelude,
+                                  parseWithPrelude)
 import           Test.Hspec
 import           TestFixtures
-import           Text.Megaparsec (errorBundlePretty)
+import           Text.Megaparsec (ParseErrorBundle, errorBundlePretty)
 
 spec :: Spec
 spec = do
@@ -96,6 +99,48 @@ spec = do
           ])
         (Var b)
 
+  describe "Parser.Prelude" $ do
+    it "loads I from the prelude" $ do
+      expectParseWithPrelude "I" identityI
+
+    it "allows user let-bindings to shadow prelude names" $ do
+      let userI = Lam z (App (Var z) (Var z))
+      expectParseWithPrelude
+        (unlines
+          [ "let I = \\z. z z"
+          , "I"
+          ])
+        userI
+
+  describe "Parser.Env" $ do
+    it "WithPrelude + let bindings: check all of them are returned on env" $ do
+      let input =
+            unlines
+              [ "let a = \\x. x"
+              , "let b = a"
+              , "b"
+              ]
+      withParsedProgram (parseWithPrelude input) $ \p -> do
+        let env = namings p
+        env `shouldHaveKeys`
+          map MkVar ["I", "K", "S", "B", "C", "W", "Y", "a", "b"]
+
+    it "WithoutPrelude + let bindings: should only have let bindings" $ do
+      let input =
+            unlines
+              [ "let a = \\x. x"
+              , "let b = a"
+              , "b"
+              ]
+      withParsedProgram (parseNoPrelude input) $ \p -> do
+        let env = namings p
+        env `shouldHaveKeys` map MkVar ["a", "b"]
+        M.size env `shouldBe` 2
+
+    it "WithoutPrelude + NO let bindings: M.empty" $ do
+      withParsedProgram (parseNoPrelude "x") $ \p ->
+        namings p `shouldBe` M.empty
+
   describe "Parser.Lexeme" $ do
     it "accepts leading spaces at the beginning of the expression" $ do
       expectParse "   x" (Var x)
@@ -175,9 +220,27 @@ spec = do
       let letx = MkVar "letx"
       expectParse "letx" (Var letx)
 
+withParsedProgram
+  :: Either (ParseErrorBundle String Void) ParsedProgram
+  -> (ParsedProgram -> Expectation)
+  -> Expectation
+withParsedProgram ep k =
+  case ep of
+    Left err -> expectationFailure (errorBundlePretty err)
+    Right p  -> k p
+
+shouldHaveKeys :: (Ord k, Show k, Show v) => M.Map k v -> [k] -> Expectation
+shouldHaveKeys m = mapM_ (\k -> m `shouldSatisfy` M.member k)
+
 expectParse :: String -> Expr -> Expectation
 expectParse s expected =
   case parsedExpr <$> parseNoPrelude s of
+    Left err     -> expectationFailure (errorBundlePretty err)
+    Right actual -> actual `shouldBe` expected
+
+expectParseWithPrelude :: String -> Expr -> Expectation
+expectParseWithPrelude s expected =
+  case parsedExpr <$> parseWithPrelude s of
     Left err     -> expectationFailure (errorBundlePretty err)
     Right actual -> actual `shouldBe` expected
 
@@ -186,4 +249,3 @@ expectFail s =
   case parsedExpr <$> parseNoPrelude s of
     Left _ -> pure ()
     Right actual -> expectationFailure ("Expected parse failure, but succeeded with: " ++ show actual)
-

@@ -58,5 +58,6 @@ test-suite lambda-calculus-test
         hspec,
         hspec-discover,
         megaparsec,
+        containers,
         lambda-calculus
     build-tool-depends: hspec-discover:hspec-discover
