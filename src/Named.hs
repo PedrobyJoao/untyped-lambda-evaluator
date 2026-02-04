@@ -1,5 +1,6 @@
 {-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveGeneric  #-}
+{-# LANGUAGE NamedFieldPuns #-}
 
 module Named where
 
@@ -8,7 +9,7 @@ import           Control.Exception           (evaluate)
 import           Control.Monad.Writer.Strict
 import           Data.Char                   (isDigit)
 import qualified Data.DList                  as DL
-import           Data.List                   (elemIndex)
+import           Data.List                   (elemIndex, intercalate)
 import qualified Data.Set                    as S
 import           Data.Word                   (Word64)
 import           GHC.Clock                   (getMonotonicTimeNSec)
@@ -24,7 +25,7 @@ data BetaReduction = Applicative | NormalOrder | CallByName
   deriving (Show, Eq, Generic, NFData)
 
 data Trace = Trace [Step]
-  deriving (Eq, Show, Generic, NFData)
+  deriving (Eq, Generic, NFData)
 
 data Step = Step
   { before         :: !Expr
@@ -50,7 +51,6 @@ data EvalStopReason
 data EvalResult = EvalResult
   { evaluated  :: !Expr
   , evalTrace  :: !Trace
-  , stepsNum   :: !Int
   , stopReason :: !EvalStopReason
   }
   deriving (Eq, Show, Generic, NFData)
@@ -79,7 +79,6 @@ evalWithTrace stepsLimit br expr = go 0 expr []
           EvalResult
             { evaluated = e
             , evalTrace = Trace (reverse acc)
-            , stepsNum = n
             , stopReason = StepLimitReached stepsLimit
             }
       | otherwise =
@@ -88,7 +87,6 @@ evalWithTrace stepsLimit br expr = go 0 expr []
               EvalResult
                 { evaluated = e
                 , evalTrace = Trace (reverse acc)
-                , stepsNum = n
                 , stopReason = ReachedNormalForm
                 }
             Just (e', ars) ->
@@ -328,6 +326,22 @@ alphaEq e1 e2 = toDB e1 == toDB e2
 -- =========================
 -- Printing
 -- =========================
+
+instance Show Trace where
+  show (Trace steps) = intercalate "\n\n" (map showStep steps)
+    where
+      showStep :: Step -> String
+      showStep Step{after, alphaRenamings} =
+        intercalate "\n" $
+          ("β→ " ++ show after) : concatMap showAlpha alphaRenamings
+
+      showAlpha :: AlphaRenaming -> [String]
+      showAlpha AlphaRenaming{beforeLambda, afterLambda} =
+        let prefix = "    α→ "
+            indent = replicate (length prefix) ' '
+        in [ prefix ++ show beforeLambda
+           , indent ++ "==> " ++ show afterLambda
+           ]
 
 instance Show Expr where
   show (Var v)     = show v
