@@ -62,7 +62,7 @@ renderStatisticsSection elapsedNs stepsCount stopReason =
   let lines' =
         [ renderElapsedLine elapsedNs
         , renderBetaStepsLine stepsCount
-        , "TerminationReason: " <> TL.pack (show stopReason)
+        , "Termination Reason: " <> TL.pack (show stopReason)
         ]
   in mconcat
       [ "<section id=\"statsSection\">"
