@@ -96,7 +96,7 @@ renderElapsedLine ns =
 
 renderBetaStepsLine :: Int -> TL.Text
 renderBetaStepsLine stepsCount
-  | stepsCount <= 0 = "β-steps: No B-steps, already in normal form (or WHNF if call-by-name)"
+  | stepsCount <= 0 = "β-Reductions: No β-reductions, already in normal form (or WHNF if call-by-name)"
   | otherwise = "β-steps: " <> TL.pack (show stepsCount)
 
 renderLinesWithBreaks :: [TL.Text] -> TL.Text

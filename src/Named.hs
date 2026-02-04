@@ -332,11 +332,11 @@ instance Show Trace where
       showStep :: Step -> String
       showStep Step{after, alphaRenamings} =
         intercalate "\n" $
-          ("β→ " ++ show after) : concatMap showAlpha alphaRenamings
+          ("β → " ++ show after) : concatMap showAlpha alphaRenamings
 
       showAlpha :: AlphaRenaming -> [String]
       showAlpha AlphaRenaming{beforeLambda, afterLambda} =
-        let prefix = "α→ "
+        let prefix = "α → "
             indent = replicate 2 ' '
         in [ indent ++ prefix ++ show beforeLambda
            , indent ++ "==> " ++ show afterLambda
