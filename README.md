@@ -16,15 +16,17 @@
   - [x] load common combinators (be careful with conflicts if user tries to define again)
   - [x] tests for withPrelude (and returned env)
   - [x] adjust prelude (have it as a file maybe?)
+- [x] refactor Main.hs, make it modular
+  - [x] e.g.: Service module (parse + eval)
+- [x] Evaluator: hardcoded limit to the number of steps
 - [ ] IO-Webpage
   - [x] dropdown info about lambda calculus and b reduction strategies..
   - [ ] statistics: eval time + number of beta reduction steps
   - [ ] statistics: steps
+  - [ ] if terminated because of stepLimit, show it
   - [ ] smaller font and more blackness on textarea part
+  - [ ] loading: do not let user resend if still evaluating
   - [ ] check reliability of htmx/pico urls and versions
-- [x] refactor Main.hs, make it modular
-  - [x] e.g.: Service module (parse + eval)
-- [ ] Evaluator: hardcoded limit to the number of steps
 - [ ] UI: correct docs
   - [ ] UI: link to prelude
 - [ ] deploy
@@ -32,16 +34,21 @@
 - [ ] README docs
 - [ ] e2e (parser + eval)
 - [ ] Extra (I may not do it):
+  - [ ] UI: copy button
+  - [ ] Indentation
   - [ ] Evaluator: trace redexes insted of entire steps
+  - [ ] UI: run all b-red strategies and compare them
+  - [ ] Eval: Call by value
   - [ ] QA: remove excess of different var names on tests, mainly `x'`, `y'`...
   - [ ] UI: automatically convert backslash to lambda
-  - [ ] UI: run all b-red strategies and compare them
   - [ ] Evaluator: HOAS and de Bruijn index?
   - [ ] Parser: Syntax sugar for multiple args (`\x y z.`)
+  - [ ] Optimal evaluator algorithm
+    - [ ] might include memoization of subterms and their normal forms
+    - [ ] Concurrent eval of `App` terms in `App e1 e2`
   - [ ] Statistics: memory usage  
          Memory usage stats is usually process wise with Haskell tools (e.g.: GHC RTS),
         so it's only more or less reliable if we execute the eval func in a separate process.
-  - [ ] Eval: Call by value
 
 ## Learn more here:
 

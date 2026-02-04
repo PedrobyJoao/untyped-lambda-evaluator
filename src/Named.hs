@@ -14,8 +14,6 @@ import           Data.Word                   (Word64)
 import           GHC.Clock                   (getMonotonicTimeNSec)
 import           GHC.Generics                (Generic)
 
-type ElapsedNs = Word64
-
 data Expr = Var Var | App Expr Expr | Lam Var Expr
   deriving (Eq, Generic, NFData)
 
@@ -44,35 +42,73 @@ data AlphaRenaming = AlphaRenaming
   }
   deriving (Eq, Show, Generic, NFData)
 
-eval :: BetaReduction -> Expr -> Expr
-eval br expr = fst $ evalWithTrace br expr
+data EvalStopReason
+  = ReachedNormalForm
+  | StepLimitReached StepsLimit
+  deriving (Eq, Show, Generic, NFData)
 
-evalWithTrace :: BetaReduction -> Expr -> (Expr, Trace)
-evalWithTrace br expr = (finalExpr, Trace (reverse stepsRev))
+data EvalResult = EvalResult
+  { evaluated  :: !Expr
+  , evalTrace  :: !Trace
+  , stepsNum   :: !Int
+  , stopReason :: !EvalStopReason
+  }
+  deriving (Eq, Show, Generic, NFData)
+
+-- maximum number of evaluation steps
+type StepsLimit = Int
+
+type ElapsedNs = Word64
+
+-- Hard limit to avoid non-terminating evaluations on the server
+-- todo: test a big expr
+maxEvalSteps :: StepsLimit
+maxEvalSteps = (2 :: Int) ^ (12 :: Int)
+
+eval :: BetaReduction -> Expr -> Expr
+eval br expr = evaluated $ evalWithTrace maxEvalSteps br expr
+
+evalWithTrace :: StepsLimit -> BetaReduction -> Expr -> EvalResult
+evalWithTrace stepsLimit br expr = go 0 expr []
   where
     reduce = reduceFn br
-    (finalExpr, stepsRev) = go expr []
-    go :: Expr -> [Step] -> (Expr, [Step])
-    go e acc = case reduce e of
-      Nothing -> (e, acc)
-      Just (e', ars) ->
-        let step =
-              Step
-                { before = e
-                , after = e'
-                , betaReduction = br
-                , alphaRenamings = ars
+
+    go :: Int -> Expr -> [Step] -> EvalResult
+    go n e acc -- n == number of steps done
+      | n >= stepsLimit =
+          EvalResult
+            { evaluated = e
+            , evalTrace = Trace (reverse acc)
+            , stepsNum = n
+            , stopReason = StepLimitReached stepsLimit
+            }
+      | otherwise =
+          case reduce e of
+            Nothing ->
+              EvalResult
+                { evaluated = e
+                , evalTrace = Trace (reverse acc)
+                , stepsNum = n
+                , stopReason = ReachedNormalForm
                 }
-        in go e' (step : acc)
+            Just (e', ars) ->
+              let step =
+                    Step
+                      { before = e
+                      , after = e'
+                      , betaReduction = br
+                      , alphaRenamings = ars
+                      }
+              in go (n + 1) e' (step : acc)
 
 -- Runs evalWithTrace, forces the result, and measures elapsed time using a monotonic clock.
-evalWithStatistics :: BetaReduction -> Expr -> IO (Expr, Trace, ElapsedNs)
-evalWithStatistics br expr = do
+evalWithStatistics :: StepsLimit -> BetaReduction -> Expr -> IO (EvalResult, ElapsedNs)
+evalWithStatistics stepsLimit br expr = do
   t0 <- getMonotonicTimeNSec
-  let res@(e, tr) = evalWithTrace br expr
+  let res = evalWithTrace stepsLimit br expr
   _ <- evaluate (force res)
   t1 <- getMonotonicTimeNSec
-  pure (e, tr, t1 - t0)
+  pure (res, t1 - t0)
 
 reduceFn :: BetaReduction -> (Expr -> Maybe (Expr, [AlphaRenaming]))
 reduceFn CallByName  = callByName

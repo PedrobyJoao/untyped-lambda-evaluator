@@ -1,5 +1,3 @@
-Note: done for learning purposes, the only AI-written part is the `test`/.
-
 # Practical lambda calculus
 
 Lambda Calculus is a _turing complete_ programming language.

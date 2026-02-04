@@ -9,8 +9,12 @@ spec = do
   describe "evalWithTrace" $ do
     it "records a single step for (I a) with empty alpha-renamings (NormalOrder)" $ do
       let expr = App identityI (Var a)
-          (finalExpr, Trace steps) = N.evalWithTrace NormalOrder expr
+          res = N.evalWithTrace N.maxEvalSteps NormalOrder expr
+          finalExpr = N.evaluated res
+          Trace steps = N.evalTrace res
+          terminationReason = N.stopReason res
 
+      terminationReason `shouldBe` ReachedNormalForm
       shouldAlphaEq finalExpr (Var a)
       length steps `shouldBe` 1
 
@@ -22,8 +26,12 @@ spec = do
 
     it "records two steps for (λx.x x)(λy.y) (Applicative)" $ do
       let expr = App (Lam x (App (Var x) (Var x))) identityI
-          (finalExpr, Trace steps) = N.evalWithTrace Applicative expr
+          res = N.evalWithTrace N.maxEvalSteps Applicative expr
+          finalExpr = N.evaluated res
+          Trace steps = N.evalTrace res
+          terminationReason = N.stopReason res
 
+      terminationReason `shouldBe` ReachedNormalForm
       shouldAlphaEq finalExpr identityI
       length steps `shouldBe` 2
 
@@ -43,8 +51,12 @@ spec = do
       -- (λx.λy.x) y
       -- Must alpha-rename inner binder y
       let expr = App (Lam x (Lam y (Var x))) (Var y)
-          (finalExpr, Trace steps) = evalWithTrace NormalOrder expr
+          res = N.evalWithTrace N.maxEvalSteps NormalOrder expr
+          finalExpr = N.evaluated res
+          Trace steps = N.evalTrace res
+          terminationReason = N.stopReason res
 
+      terminationReason `shouldBe` ReachedNormalForm
       shouldAlphaEq finalExpr (Lam z (Var y))
       length steps `shouldBe` 1
 

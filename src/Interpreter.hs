@@ -4,8 +4,9 @@ module Interpreter (interpret) where
 
 import qualified Data.Map.Strict as M
 import qualified Data.Text.Lazy  as TL
-import           Named           (BetaReduction, ElapsedNs, Expr, Trace, Var,
-                                  alphaEq, evalWithStatistics)
+import           Named           (BetaReduction, ElapsedNs, EvalResult (..),
+                                  Expr, Trace, Var, alphaEq, evalWithStatistics,
+                                  maxEvalSteps)
 import           Parser          (ParsedProgram (..), parseNoPrelude,
                                   parseWithPrelude)
 import           Text.Megaparsec (errorBundlePretty)
@@ -32,10 +33,12 @@ interpret strategy withPrelude exprStr = do
       pure $ Left (TL.pack (errorBundlePretty parseErr))
 
     Right parsedProgram -> do
-      (result, _trace, elapsedNs) <-
-        evalWithStatistics strategy (parsedExpr parsedProgram)
+      (evalRes, elapsedNs) <-
+        evalWithStatistics maxEvalSteps strategy (parsedExpr parsedProgram)
+      let result = evaluated evalRes
+      let tr = evalTrace evalRes
       let outputTxt = resolveOutputIfReferenced result (namings parsedProgram)
-      pure $ Right (outputTxt, _trace, elapsedNs)
+      pure $ Right (outputTxt, tr, elapsedNs)
 
 -- ============
 -- Output resolution: replace for a name if expression matches a binding
