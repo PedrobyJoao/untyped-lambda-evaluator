@@ -101,7 +101,12 @@
       </header>
 
       <article class="panel">
-        <form hx-post="/eval" hx-target="#results" hx-swap="innerHTML">
+        <form
+          hx-post="/eval"
+          hx-target="#results"
+          hx-swap="innerHTML"
+          hx-disabled-elt="#evalButton"
+        >
           <label>
             <input type="checkbox" name="withPrelude" />
             <span>Include Prelude (TODO: link to prelude envs)</span>
@@ -219,7 +224,7 @@
             <span>Show beta reductions</span>
           </label>
 
-          <button type="submit">Evaluate</button>
+          <button id="evalButton" type="submit">Evaluate</button>
         </form>
       </article>
 

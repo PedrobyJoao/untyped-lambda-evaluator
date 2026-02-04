@@ -539,3 +539,34 @@ button.hint:focus {
 details > summary[role="button"] {
   width: fit-content !important;
 }
+
+/* --- HTMX loading indicator for Evaluate button (no JS) --- */
+#evalButton {
+  position: relative;
+}
+
+#evalButton.htmx-request {
+  opacity: 0.85;
+  cursor: progress;
+  padding-right: 2.4rem;
+}
+
+#evalButton.htmx-request::after {
+  content: "";
+  position: absolute;
+  right: 0.9rem;
+  top: 50%;
+  width: 1rem;
+  height: 1rem;
+  margin-top: -0.5rem;
+  border: 2px solid rgba(255, 255, 255, 0.45);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: evalspin 0.8s linear infinite;
+}
+
+@keyframes evalspin {
+  to {
+    transform: rotate(360deg);
+  }
+}

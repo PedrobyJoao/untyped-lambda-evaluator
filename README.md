@@ -31,6 +31,7 @@
   - [ ] link to prelude
   - [ ] add PS because equational reference might
         replace the output for something unexpected
+- [ ] Eval: improve show expr
 - [ ] UI: correct docs
 - [ ] deploy
   - [ ] as-package/containerize
@@ -40,6 +41,7 @@
 - [ ] e2e (parser + eval)
 - [ ] tests for functions marked with `todo: test`
 - [ ] Extra (I may not do it):
+  - [ ] UI: use Blaze-HTML in Web.Render instead of pure strings
   - [ ] UI: copy button
   - [ ] Indentation
   - [ ] Evaluator: trace redexes insted of entire steps
