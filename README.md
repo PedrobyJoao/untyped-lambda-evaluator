@@ -25,12 +25,14 @@
     - [x] if terminated because of stepLimit, show it
   - [x] statistics (C3): steps
   - [x] checkbox for steps
-  - [ ] loading: do not let user resend if still evaluating
+  - [x] loading: do not let user resend if still evaluating
+  - [ ] everything seems so compressed, can we resolve that?
+  - [ ] show beta-reductions -> use symbol
   - [ ] smaller font and more blackness on textarea part
-  - [ ] check reliability of htmx/pico urls and versions
   - [ ] link to prelude
   - [ ] add PS because equational reference might
         replace the output for something unexpected
+  - [ ] check reliability of htmx/pico urls and versions
 - [ ] Eval: improve show expr
 - [ ] UI: correct docs
 - [ ] deploy

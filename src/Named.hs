@@ -45,7 +45,7 @@ data AlphaRenaming = AlphaRenaming
 
 data EvalStopReason
   = NoMoreReductions
-  | StepLimitReached StepsLimit
+  | MaxNumberOfSteps StepsLimit
   deriving (Eq, Show, Generic, NFData)
 
 data EvalResult = EvalResult
@@ -78,7 +78,7 @@ evalWithTrace stepsLimit br expr = go 0 expr []
           EvalResult
             { evaluated = e
             , evalTrace = Trace (reverse acc)
-            , stopReason = StepLimitReached stepsLimit
+            , stopReason = MaxNumberOfSteps stepsLimit
             }
       | otherwise =
           case reduce e of
