@@ -33,9 +33,10 @@
   - [x] show beta-reductions -> use symbol
   - [x] link to prelude
   - [x] add WHNF to Call-by-name string strategy
-  - [ ] add PS because equational reference might
-        replace the output for something unexpected
+  - [ ] add PS because equational reference might replace the output for something unexpected
   - [ ] check reliability of htmx/pico urls and versions
+  - [ ] even space between strategy options
+  - [ ] change color pallete
 - [ ] Eval: improve show expr
 - [ ] UI: correct docs
 - [ ] UI: easter-egg strategy
