@@ -1,0 +1,32 @@
+-- Source: https://github.com/tromp/AIT/blob/master/characteristic_sequences/primes.lam
+
+-- Example used to test evals reaching the limit of beta reduction steps
+
+-- outputs characteristic sequence of primes
+
+let cons = \x. \y. \z. z x y
+let Ssucc = \Sn. \c. \x. \xs. cons x (xs (Sn c))
+
+let B1 = \x. \y. y
+let Y = \f. (\x. x x) (\x. f (x x))
+
+let B0 = \x. \y. x
+let cons0 = \y. \z. z B0 y
+let S0 = \cont. \x. \xs. cons0 (xs cont)
+
+let sieveGen = \self. \Sn. cons B1 ((\Ssn. (self Ssn) (Y Ssn)) (Ssucc Sn))
+let sieve = Y sieveGen
+
+let primes = cons0 (cons0 (sieve S0))
+
+let c2 = \f. \x. f (f x)
+let c3 = \f. \x. f (f (f x))
+let c4 = c2 c2
+let c12 = \f. c3 (c4 f)
+let c4k = c12 c2
+
+let tk = \cont. \x. \xs. \z. z x (xs cont)
+let someprimes = primes (c4k tk (B0 (B0 B1)))
+
+let main = primes
+main
