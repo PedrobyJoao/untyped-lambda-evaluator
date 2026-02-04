@@ -26,10 +26,10 @@
   - [x] statistics (C3): steps
   - [x] checkbox for steps
   - [x] loading: do not let user resend if still evaluating
+  - [x] (mobile): b-red strategies component extends itself out of the form box
   - [ ] improve the dropdown info -> maybe use accordion or fix modal
   - [ ] everything seems so compressed, can we resolve that?
   - [ ] smaller font and more blackness on textarea part
-  - [ ] (mobile): b-red strategies component extends itself out of the form box
   - [ ] show beta-reductions -> use symbol
   - [ ] link to prelude
   - [ ] add WHNF to Call-by-name string strategy

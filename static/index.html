@@ -184,36 +184,36 @@
                   even when a normal form exists.
                 </div>
               </div>
+            </div>
 
-              <div class="strategy-row">
-                <label>
-                  <input type="radio" name="strategy" value="cbn" />
-                  <span>Call-by-name</span>
-                </label>
+            <div class="strategy-row">
+              <label>
+                <input type="radio" name="strategy" value="cbn" />
+                <span>Call-by-name</span>
+              </label>
 
-                <div class="hint-wrap">
-                  <button
-                    type="button"
-                    class="hint"
-                    aria-label="Call-by-name strategy hint"
-                    aria-describedby="hint-cbn"
+              <div class="hint-wrap">
+                <button
+                  type="button"
+                  class="hint"
+                  aria-label="Call-by-name strategy hint"
+                  aria-describedby="hint-cbn"
+                >
+                  <svg
+                    class="ui-icon ui-icon--sm"
+                    aria-hidden="true"
+                    focusable="false"
                   >
-                    <svg
-                      class="ui-icon ui-icon--sm"
-                      aria-hidden="true"
-                      focusable="false"
-                    >
-                      <use
-                        href="/static/icons.svg#icon-help"
-                        xlink:href="/static/icons.svg#icon-help"
-                      ></use>
-                    </svg>
-                  </button>
-                  <div id="hint-cbn" class="tooltip" role="tooltip">
-                    Reduces only the leftmost outermost until a lambda, then
-                    applies arguments without reducing them. Does not reduce
-                    inside lambdas.
-                  </div>
+                    <use
+                      href="/static/icons.svg#icon-help"
+                      xlink:href="/static/icons.svg#icon-help"
+                    ></use>
+                  </svg>
+                </button>
+                <div id="hint-cbn" class="tooltip" role="tooltip">
+                  Reduces only the leftmost outermost until a lambda, then
+                  applies arguments without reducing them. Does not reduce
+                  inside lambdas.
                 </div>
               </div>
             </div>
