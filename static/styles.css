@@ -177,15 +177,25 @@ header {
   background-color: transparent !important;
 }
 
-/* Textarea: slightly tighter, “editor” feel */
+/* Textarea: more “editor” feel */
 textarea {
   background-color: var(--surface) !important;
   border-color: var(--border) !important;
   border-radius: 0.9rem;
-  font-size: 1.05rem;
-  line-height: 1.45;
-  min-height: 16rem;
-  padding: 1rem 1.05rem !important;
+
+  /* Ensure it stays monospaced/code-like */
+  font-family: var(--code-font) !important;
+
+  /* Bigger box, slightly smaller font */
+  min-height: 20rem;
+  font-size: 0.95rem;
+  line-height: 1.55;
+
+  /* More “blackness” */
+  font-weight: 500;
+  color: rgba(17, 24, 39, 0.98) !important;
+
+  padding: 1.05rem 1.1rem !important;
 }
 
 textarea:focus,
