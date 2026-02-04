@@ -18,8 +18,13 @@ renderOutputOnly :: TL.Text -> TL.Text
 renderOutputOnly outputText =
   renderOutputSection outputText
 
-renderOutputAndStatistics :: TL.Text -> ElapsedNs -> Int -> EvalStopReason -> TL.Text
-renderOutputAndStatistics outputText elapsedNs stepsCount stopReason =
+renderOutputAndStatistics
+  :: TL.Text
+  -> ElapsedNs
+  -> Int
+  -> EvalStopReason
+  -> TL.Text
+renderOutputAndStatistics outputText elapsedNs stepsCount stopReason=
   mconcat
     [ renderOutputSection outputText
     , renderStatisticsSection elapsedNs stepsCount stopReason
@@ -70,18 +75,14 @@ renderStatisticsSection elapsedNs stepsCount stopReason =
       , "</section>"
       ]
 
--- Collapsed by default. Caller should avoid calling this when stepsCount == 0.
 renderStepsSection :: Trace -> TL.Text
 renderStepsSection trace =
   mconcat
     [ "<section id=\"stepsSection\">"
     , "<p class=\"result-label\">β-steps:</p>"
-    , "<details id=\"stepsDetails\">"
-    , "<summary role=\"button\">Show β-steps</summary>"
     , "<pre class=\"result-pre\" id=\"stepsPre\">"
     , escapeHtml (TL.pack (show trace))
     , "</pre>"
-    , "</details>"
     , "</section>"
     ]
 

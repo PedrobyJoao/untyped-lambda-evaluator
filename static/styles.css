@@ -495,7 +495,8 @@ button.hint:focus {
 }
 
 #outputSection,
-#statsSection {
+#statsSection,
+#stepsSection {
   margin: 0 0 1rem 0;
 }
 

@@ -8,8 +8,8 @@ import           Control.Exception             (SomeException)
 import           Control.Monad.IO.Class        (liftIO)
 import qualified Data.Text.Lazy                as TL
 import           Interpreter                   (interpret)
-import           Named                         (BetaReduction (..), EvalResult (..),
-                                                Trace (..))
+import           Named                         (BetaReduction (..),
+                                                EvalResult (..), Trace (..))
 import           Network.Wai.Middleware.Static (Policy, hasPrefix,
                                                 isNotAbsolute, noDots,
                                                 staticPolicy, (>->))
@@ -37,10 +37,14 @@ postEval :: ActionM ()
 postEval = do
   exprTxt <- formParam "expr" :: ActionM TL.Text
   stratTxt <- formParam "strategy" :: ActionM TL.Text
+
   withPreludeTxt <- (formParam "withPrelude" :: ActionM TL.Text)
-    `catch` onMissingPrelude
+    `catch` onMissingCheckbox
+  showStepsTxt <- (formParam "showSteps" :: ActionM TL.Text)
+    `catch` onMissingCheckbox
 
   let withPrelude = isChecked withPreludeTxt
+  let showSteps = isChecked showStepsTxt
 
   case parseStrategy stratTxt of
     Left stratErr ->
@@ -55,15 +59,8 @@ postEval = do
           let Trace steps = evalTrace evalRes
           let stepsCount = length steps
 
-          if stepsCount <= 0
+          if showSteps && stepsCount > 0
             then
-              html $
-                renderOutputAndStatistics
-                  outputTxt
-                  elapsedNs
-                  stepsCount
-                  (stopReason evalRes)
-            else
               html $
                 renderOutputAndStatisticsAndSteps
                   outputTxt
@@ -71,6 +68,13 @@ postEval = do
                   stepsCount
                   (stopReason evalRes)
                   (evalTrace evalRes)
+            else
+              html $
+                renderOutputAndStatistics
+                  outputTxt
+                  elapsedNs
+                  stepsCount
+                  (stopReason evalRes)
 
 -- ============
 -- Process I/O
@@ -87,8 +91,8 @@ parseStrategy t =
 isChecked :: TL.Text -> Bool
 isChecked t = TL.toLower (TL.strip t) == "on"
 
-onMissingPrelude :: SomeException -> ActionM TL.Text
-onMissingPrelude _ = pure "off"
+onMissingCheckbox :: SomeException -> ActionM TL.Text
+onMissingCheckbox _ = pure "off"
 
 -- ============
 -- Middleware

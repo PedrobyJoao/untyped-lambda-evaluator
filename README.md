@@ -21,18 +21,24 @@
 - [x] Evaluator: hardcoded limit to the number of steps
 - [ ] IO-Webpage
   - [x] dropdown info about lambda calculus and b reduction strategies..
-  - [ ] statistics (C2): eval time + number of beta reduction steps
-    - [ ] if terminated because of stepLimit, show it
-  - [ ] statistics (C3): steps
+  - [x] statistics (C2): eval time + number of beta reduction steps
+    - [x] if terminated because of stepLimit, show it
+  - [x] statistics (C3): steps
+  - [x] checkbox for steps
   - [ ] loading: do not let user resend if still evaluating
   - [ ] smaller font and more blackness on textarea part
   - [ ] check reliability of htmx/pico urls and versions
   - [ ] link to prelude
+  - [ ] add PS because equational reference might
+        replace the output for something unexpected
 - [ ] UI: correct docs
 - [ ] deploy
-- [ ] CI/CD with tests and build
+  - [ ] as-package/containerize
+  - [ ] VPS? deploy service?
+  - [ ] CI/CD (build + tests) + deployment
 - [ ] README docs
 - [ ] e2e (parser + eval)
+- [ ] tests for functions marked with `todo: test`
 - [ ] Extra (I may not do it):
   - [ ] UI: copy button
   - [ ] Indentation
@@ -44,7 +50,9 @@
   - [ ] UI:statistics: number of alpha renamings
   - [ ] Evaluator: HOAS and de Bruijn index?
   - [ ] Parser: Syntax sugar for multiple args (`\x y z.`)
-  - [ ] Optimal evaluator algorithm
+  - [ ] Optimal evaluator
+    - [ ] have trace building optional
+    - [ ] a better algorithm
     - [ ] might include memoization of subterms and their normal forms
     - [ ] Concurrent eval of `App` terms in `App e1 e2`
   - [ ] Statistics: memory usage  
