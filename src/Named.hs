@@ -44,7 +44,7 @@ data AlphaRenaming = AlphaRenaming
   deriving (Eq, Show, Generic, NFData)
 
 data EvalStopReason
-  = ReachedNormalForm
+  = NoMoreReductions
   | StepLimitReached StepsLimit
   deriving (Eq, Show, Generic, NFData)
 
@@ -57,7 +57,6 @@ data EvalResult = EvalResult
 
 -- maximum number of evaluation steps
 type StepsLimit = Int
-
 type ElapsedNs = Word64
 
 -- Hard limit to avoid non-terminating evaluations on the server
@@ -87,7 +86,7 @@ evalWithTrace stepsLimit br expr = go 0 expr []
               EvalResult
                 { evaluated = e
                 , evalTrace = Trace (reverse acc)
-                , stopReason = ReachedNormalForm
+                , stopReason = NoMoreReductions
                 }
             Just (e', ars) ->
               let step =
@@ -337,9 +336,9 @@ instance Show Trace where
 
       showAlpha :: AlphaRenaming -> [String]
       showAlpha AlphaRenaming{beforeLambda, afterLambda} =
-        let prefix = "    α→ "
-            indent = replicate (length prefix) ' '
-        in [ prefix ++ show beforeLambda
+        let prefix = "α→ "
+            indent = replicate 2 ' '
+        in [ indent ++ prefix ++ show beforeLambda
            , indent ++ "==> " ++ show afterLambda
            ]
 

@@ -21,14 +21,14 @@
 - [x] Evaluator: hardcoded limit to the number of steps
 - [ ] IO-Webpage
   - [x] dropdown info about lambda calculus and b reduction strategies..
-  - [ ] statistics: eval time + number of beta reduction steps
-  - [ ] statistics: steps
-  - [ ] if terminated because of stepLimit, show it
-  - [ ] smaller font and more blackness on textarea part
+  - [ ] statistics (C2): eval time + number of beta reduction steps
+    - [ ] if terminated because of stepLimit, show it
+  - [ ] statistics (C3): steps
   - [ ] loading: do not let user resend if still evaluating
+  - [ ] smaller font and more blackness on textarea part
   - [ ] check reliability of htmx/pico urls and versions
+  - [ ] link to prelude
 - [ ] UI: correct docs
-  - [ ] UI: link to prelude
 - [ ] deploy
 - [ ] CI/CD with tests and build
 - [ ] README docs
@@ -41,6 +41,7 @@
   - [ ] Eval: Call by value
   - [ ] QA: remove excess of different var names on tests, mainly `x'`, `y'`...
   - [ ] UI: automatically convert backslash to lambda
+  - [ ] UI:statistics: number of alpha renamings
   - [ ] Evaluator: HOAS and de Bruijn index?
   - [ ] Parser: Syntax sugar for multiple args (`\x y z.`)
   - [ ] Optimal evaluator algorithm

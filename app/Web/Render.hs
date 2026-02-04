@@ -2,8 +2,9 @@
 
 module Web.Render where
 
+import           Data.List      (intersperse)
 import qualified Data.Text.Lazy as TL
-import           Named          (ElapsedNs)
+import           Named          (ElapsedNs, EvalStopReason, Trace)
 import           Text.Printf    (printf)
 
 -- ============
@@ -11,8 +12,37 @@ import           Text.Printf    (printf)
 -- from the server
 -- =============
 
+-- Public renderers (organized by caller needs)
+
 renderOutputOnly :: TL.Text -> TL.Text
 renderOutputOnly outputText =
+  renderOutputSection outputText
+
+renderOutputAndStatistics :: TL.Text -> ElapsedNs -> Int -> EvalStopReason -> TL.Text
+renderOutputAndStatistics outputText elapsedNs stepsCount stopReason =
+  mconcat
+    [ renderOutputSection outputText
+    , renderStatisticsSection elapsedNs stepsCount stopReason
+    ]
+
+renderOutputAndStatisticsAndSteps
+  :: TL.Text
+  -> ElapsedNs
+  -> Int
+  -> EvalStopReason
+  -> Trace
+  -> TL.Text
+renderOutputAndStatisticsAndSteps outputText elapsedNs stepsCount stopReason _trace =
+  mconcat
+    [ renderOutputSection outputText
+    , renderStatisticsSection elapsedNs stepsCount stopReason
+    , renderStepsSection _trace
+    ]
+
+-- Sections
+
+renderOutputSection :: TL.Text -> TL.Text
+renderOutputSection outputText =
   mconcat
     [ "<section id=\"outputSection\">"
     , "<p class=\"result-label\">Output:</p>"
@@ -22,30 +52,55 @@ renderOutputOnly outputText =
     , "</section>"
     ]
 
-renderOutputAndStats :: TL.Text -> TL.Text -> TL.Text
-renderOutputAndStats outputText statsInner =
+renderStatisticsSection :: ElapsedNs -> Int -> EvalStopReason -> TL.Text
+renderStatisticsSection elapsedNs stepsCount stopReason =
+  let lines' =
+        [ renderElapsedLine elapsedNs
+        , renderBetaStepsLine stepsCount
+        , "TerminationReason: " <> TL.pack (show stopReason)
+        ]
+  in mconcat
+      [ "<section id=\"statsSection\">"
+      , "<p class=\"result-label\">Statistics:</p>"
+      , "<div class=\"result-box\" id=\"statsBox\">"
+      , "<div id=\"statsContent\">"
+      , renderLinesWithBreaks lines'
+      , "</div>"
+      , "</div>"
+      , "</section>"
+      ]
+
+-- Collapsed by default. Caller should avoid calling this when stepsCount == 0.
+renderStepsSection :: Trace -> TL.Text
+renderStepsSection trace =
   mconcat
-    [ "<section id=\"outputSection\">"
-    , "<p class=\"result-label\">Output:</p>"
-    , "<pre class=\"result-pre\" id=\"outputPre\">"
-    , escapeHtml outputText
+    [ "<section id=\"stepsSection\">"
+    , "<p class=\"result-label\">β-steps:</p>"
+    , "<details id=\"stepsDetails\">"
+    , "<summary role=\"button\">Show β-steps</summary>"
+    , "<pre class=\"result-pre\" id=\"stepsPre\">"
+    , escapeHtml (TL.pack (show trace))
     , "</pre>"
-    , "</section>"
-    , "<section id=\"statsSection\">"
-    , "<p class=\"result-label\">Statistics:</p>"
-    , "<div class=\"result-box\" id=\"statsBox\">"
-    , "<div id=\"statsContent\">"
-    , escapeHtml statsInner
-    , "</div>"
-    , "</div>"
+    , "</details>"
     , "</section>"
     ]
 
-renderStats :: ElapsedNs -> TL.Text
-renderStats ns =
+-- Statistics helpers
+
+renderElapsedLine :: ElapsedNs -> TL.Text
+renderElapsedLine ns =
   let ms :: Double
       ms = fromIntegral ns / 1e6
   in TL.pack (printf "Elapsed: %.3f ms (%d ns)" ms ns)
+
+renderBetaStepsLine :: Int -> TL.Text
+renderBetaStepsLine stepsCount
+  | stepsCount <= 0 = "β-steps: No B-steps, already in normal form (or WHNF if call-by-name)"
+  | otherwise = "β-steps: " <> TL.pack (show stepsCount)
+
+renderLinesWithBreaks :: [TL.Text] -> TL.Text
+renderLinesWithBreaks =
+  mconcat . intersperse "<br/>" . map escapeHtml
 
 -- minimal HTML escaping to avoid breaking markup when embedding errors/results
 escapeHtml :: TL.Text -> TL.Text

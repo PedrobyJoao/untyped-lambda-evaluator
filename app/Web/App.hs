@@ -8,7 +8,8 @@ import           Control.Exception             (SomeException)
 import           Control.Monad.IO.Class        (liftIO)
 import qualified Data.Text.Lazy                as TL
 import           Interpreter                   (interpret)
-import           Named                         (BetaReduction (..))
+import           Named                         (BetaReduction (..), EvalResult (..),
+                                                Trace (..))
 import           Network.Wai.Middleware.Static (Policy, hasPrefix,
                                                 isNotAbsolute, noDots,
                                                 staticPolicy, (>->))
@@ -50,8 +51,26 @@ postEval = do
       case result of
         Left errTxt ->
           html $ renderOutputOnly errTxt
-        Right (outputTxt, _, elapsedNs) ->
-          html $ renderOutputAndStats outputTxt (renderStats elapsedNs)
+        Right (outputTxt, evalRes, elapsedNs) -> do
+          let Trace steps = evalTrace evalRes
+          let stepsCount = length steps
+
+          if stepsCount <= 0
+            then
+              html $
+                renderOutputAndStatistics
+                  outputTxt
+                  elapsedNs
+                  stepsCount
+                  (stopReason evalRes)
+            else
+              html $
+                renderOutputAndStatisticsAndSteps
+                  outputTxt
+                  elapsedNs
+                  stepsCount
+                  (stopReason evalRes)
+                  (evalTrace evalRes)
 
 -- ============
 -- Process I/O
