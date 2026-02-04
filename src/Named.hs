@@ -46,7 +46,7 @@ data AlphaRenaming = AlphaRenaming
 data EvalStopReason
   = NoMoreReductions
   | MaxNumberOfSteps StepsLimit
-  deriving (Eq, Show, Generic, NFData)
+  deriving (Eq, Generic, NFData)
 
 data EvalResult = EvalResult
   { evaluated  :: !Expr
@@ -364,6 +364,9 @@ instance Show Expr where
 instance Show Var where
   show (MkVar v) = v
 
+instance Show EvalStopReason where
+  show NoMoreReductions     = "no more reductions to be applied"
+  show (MaxNumberOfSteps n) = "max number of steps (" ++ show n ++ ") reached"
 
 -- =========================
 -- Helpers
