@@ -91,13 +91,21 @@
           </label>
 
           <label for="expr" class="sr-only">Expression</label>
-          <textarea
-            id="expr"
-            name="expr"
-            rows="10"
-            placeholder="\x.x"
-            required
-          ></textarea>
+          <textarea id="expr" name="expr" rows="10" required>
+-- Example format:
+-- 1) zero or more let bindings (definitions)
+-- 2) a final expression to evaluate (the last non-comment line)
+
+-- Church numerals
+let one = λf. λx. f x
+let two = λf. λx. f (f x)
+let three = λf. λx. f (f (f x))
+
+let add = λm. λn. λf. λx. m f (n f x)
+
+-- expression to be evaluated (1 + 2)
+add one two
+          </textarea>
 
           <fieldset>
             <legend>β-Reduction strategy:</legend>

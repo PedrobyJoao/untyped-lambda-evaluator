@@ -32,10 +32,10 @@
   - [x] show beta-reductions -> use symbol
   - [x] link to prelude
   - [x] add WHNF to Call-by-name string strategy
-  - [ ] everything seems so compressed, can we resolve that?
+  - [x] everything seems so compressed, can we resolve that?
+  - [x] change color pallete
   - [ ] add PS because equational reference might replace the output for something unexpected
   - [ ] check reliability of htmx/pico urls and versions
-  - [ ] change color pallete
 - [ ] Eval: improve show expr
 - [ ] UI: easter-egg strategy
 - [ ] UI: correct docs
