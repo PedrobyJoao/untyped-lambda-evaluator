@@ -14,7 +14,7 @@ spec = do
           Trace steps = N.evalTrace res
           terminationReason = N.stopReason res
 
-      terminationReason `shouldBe` ReachedNormalForm
+      terminationReason `shouldBe` NoMoreReductions
       shouldAlphaEq finalExpr (Var a)
       length steps `shouldBe` 1
 
@@ -31,7 +31,7 @@ spec = do
           Trace steps = N.evalTrace res
           terminationReason = N.stopReason res
 
-      terminationReason `shouldBe` ReachedNormalForm
+      terminationReason `shouldBe` NoMoreReductions
       shouldAlphaEq finalExpr identityI
       length steps `shouldBe` 2
 
@@ -56,7 +56,7 @@ spec = do
           Trace steps = N.evalTrace res
           terminationReason = N.stopReason res
 
-      terminationReason `shouldBe` ReachedNormalForm
+      terminationReason `shouldBe` NoMoreReductions
       shouldAlphaEq finalExpr (Lam z (Var y))
       length steps `shouldBe` 1
 
