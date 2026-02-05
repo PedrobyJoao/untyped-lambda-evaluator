@@ -3,14 +3,6 @@ html {
   color-scheme: light;
 }
 
-/*
- * Option E — "Graphite + desaturated blue"
- * Simple, low-saturation theme:
- * - cool paper-like background
- * - subtle borders
- * - single muted teal accent
- * - no gradients / no glass effects
- */
 :root {
   /* Fonts */
   --ui-font:
