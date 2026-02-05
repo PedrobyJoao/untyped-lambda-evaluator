@@ -18,20 +18,15 @@ let if      = \p. \a. \b. p a b
 let pair    = \x. \y. \f. f x y
 let cons    = \x. \y. \f. f x y
 
-
--- Classic combinator aliases
+-- combinator aliases
 
 let I = id
 let K = const
 let B = compose
 let C = flip
 
--- S combinator
-
+-- S and W combinator
 let S = \x. \y. \z. x z (y z)
-
--- W combinator
-
 let W = \f. \x. f x x
 
 -- church encoding
