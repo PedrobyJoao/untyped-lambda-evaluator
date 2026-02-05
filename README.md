@@ -19,7 +19,7 @@
 - [x] refactor Main.hs, make it modular
   - [x] e.g.: Service module (parse + eval)
 - [x] Evaluator: hardcoded limit to the number of steps
-- [ ] IO-Webpage
+- [x] IO-Webpage
   - [x] dropdown info about lambda calculus and b reduction strategies..
   - [x] statistics (C2): eval time + number of beta reduction steps
     - [x] if terminated because of stepLimit, show it
@@ -34,11 +34,11 @@
   - [x] add WHNF to Call-by-name string strategy
   - [x] everything seems so compressed, can we resolve that?
   - [x] change color pallete
-  - [ ] add PS because equational reference might replace the output for something unexpected
-  - [ ] check reliability of htmx/pico urls and versions
-- [ ] Eval: improve show expr
+  - [x] check reliability of htmx/pico urls and versions
+- [x] Eval: improve show expr
 - [ ] UI: easter-egg strategy
 - [ ] UI: correct docs
+  - [ ] add PS because equational reference might replace the output for something unexpected
 - [ ] deploy
   - [ ] as-package/containerize
   - [ ] VPS? deploy service?
@@ -47,6 +47,7 @@
 - [ ] e2e (parser + eval)
 - [ ] tests for functions marked with `todo: test`
 - [ ] Extra (I may not do it):
+  - [ ] SRI for pico/htmx urls
   - [ ] UI: use Blaze-HTML in Web.Render instead of pure strings
   - [ ] UI: copy button
   - [ ] Indentation
