@@ -97,11 +97,11 @@
 -- 2) a final expression to evaluate (the last non-comment line)
 
 -- Church numerals
-let one = λf. λx. f x
-let two = λf. λx. f (f x)
-let three = λf. λx. f (f (f x))
+let one = \f.\x. f x
+let two = \f.\x. f (f x)
+let three = \f.\x. f (f (f x))
 
-let add = λm. λn. λf. λx. m f (n f x)
+let add = \m.\n.\f.\x. m f (n f x)
 
 -- expression to be evaluated (1 + 2)
 add one two
