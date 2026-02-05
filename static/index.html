@@ -24,74 +24,6 @@
   </head>
 
   <body>
-    <button
-      id="openInfo"
-      class="secondary outline"
-      type="button"
-      aria-label="Info"
-    >
-      <svg class="ui-icon ui-icon--lg" aria-hidden="true" focusable="false">
-        <use
-          href="/static/icons.svg#icon-help"
-          xlink:href="/static/icons.svg#icon-help"
-        ></use>
-      </svg>
-    </button>
-
-    <!-- Pico Modal -->
-    <dialog id="infoModal" aria-labelledby="infoModalTitle">
-      <article>
-        <header>
-          <button id="closeInfo" aria-label="Close" rel="prev"></button>
-          <p>
-            <strong id="infoModalTitle">About</strong>
-          </p>
-        </header>
-
-        <p>
-          This app parses and evaluates lambda calculus expressions using
-          different β-reduction strategies.
-        </p>
-
-        <h3>How to use</h3>
-        <ol>
-          <li>Enter a lambda expression (example: <code>\x. x</code>).</li>
-          <li>Select a reduction strategy.</li>
-          <li>Press <strong>Evaluate</strong> to normalize.</li>
-        </ol>
-
-        <h3>Syntax</h3>
-        <ul>
-          <li>Lambda: <code>\x. body</code></li>
-          <li>Application: <code>f x</code> (use parentheses as needed)</li>
-          <li>Variables: <code>x</code>, <code>foo</code>, etc.</li>
-        </ul>
-
-        <h3>β-reduction strategies</h3>
-        <ul>
-          <li>
-            <strong>Normal order</strong>: leftmost outermost first. If a normal
-            form exists, normal order will find it.
-          </li>
-          <li>
-            <strong>Call-by-name (CBN)</strong>: like normal order, but does not
-            reduce inside lambdas.
-          </li>
-          <li>
-            <strong>Applicative order</strong>: rightmost innermost first
-            (reduces arguments before applying). Can diverge even when a normal
-            form exists.
-          </li>
-        </ul>
-
-        <footer>
-          <button class="secondary" type="button" id="closeInfoFooter">
-            Close
-          </button>
-        </footer>
-      </article>
-    </dialog>
-
     <main class="container">
       <header class="page-header">
         <h1>Evaluate untyped λ-calculus</h1>
@@ -99,6 +31,46 @@
           Write an expression, choose a strategy, and evaluate.
         </p>
       </header>
+
+      <section class="info-accordion" aria-label="About and help">
+        <details>
+          <summary>About</summary>
+          <p>
+            This app parses and evaluates lambda calculus expressions using
+            different β-reduction strategies.
+          </p>
+          <h3>How to use</h3>
+          <ol>
+            <li>Enter a lambda expression (example: <code>\x. x</code>).</li>
+            <li>Select a reduction strategy.</li>
+            <li>Press <strong>Evaluate</strong> to normalize.</li>
+          </ol>
+
+          <h3>Syntax</h3>
+          <ul>
+            <li>Lambda: <code>\x. body</code></li>
+            <li>Application: <code>f x</code> (use parentheses as needed)</li>
+            <li>Variables: <code>x</code>, <code>foo</code>, etc.</li>
+          </ul>
+
+          <h3>β-reduction strategies</h3>
+          <ul>
+            <li>
+              <strong>Normal order</strong>: leftmost outermost first. If a
+              normal form exists, normal order will find it.
+            </li>
+            <li>
+              <strong>Call-by-name (CBN)</strong>: like normal order, but does
+              not reduce inside lambdas.
+            </li>
+            <li>
+              <strong>Applicative order</strong>: rightmost innermost first
+              (reduces arguments before applying). Can diverge even when a
+              normal form exists.
+            </li>
+          </ul>
+        </details>
+      </section>
 
       <article class="panel">
         <form
@@ -238,45 +210,5 @@
     </main>
 
     <script src="https://unpkg.com/htmx.org@1.9.12"></script>
-    <script>
-      (function () {
-        const openBtn = document.getElementById("openInfo");
-        const dialog = document.getElementById("infoModal");
-        const closeBtn = document.getElementById("closeInfo");
-        const closeFooterBtn = document.getElementById("closeInfoFooter");
-
-        function openModal() {
-          if (typeof dialog.showModal === "function") {
-            dialog.showModal();
-          } else {
-            // Fallback: if <dialog> not supported, just show it as open.
-            dialog.setAttribute("open", "open");
-          }
-        }
-
-        function closeModal() {
-          if (typeof dialog.close === "function") {
-            dialog.close();
-          } else {
-            dialog.removeAttribute("open");
-          }
-        }
-
-        openBtn.addEventListener("click", openModal);
-        closeBtn.addEventListener("click", closeModal);
-        closeFooterBtn.addEventListener("click", closeModal);
-
-        // Close when clicking the backdrop (outside the article)
-        dialog.addEventListener("click", (e) => {
-          if (e.target === dialog) closeModal();
-        });
-
-        // Ensure ESC works consistently even with fallback
-        dialog.addEventListener("cancel", (e) => {
-          e.preventDefault();
-          closeModal();
-        });
-      })();
-    </script>
   </body>
 </html>

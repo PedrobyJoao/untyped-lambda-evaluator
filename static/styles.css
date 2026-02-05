@@ -329,53 +329,48 @@ h1 {
   height: 1.15rem;
 }
 
-/* Top-right Info button: a bit smaller */
-#openInfo {
-  position: fixed;
-  top: 1rem;
-  right: 1rem;
-  z-index: 12000;
-  border-radius: 0.8rem !important;
-
-  background: var(--surface) !important;
-  border-color: rgba(180, 83, 9, 0.28) !important;
-  box-shadow: var(--pico-box-shadow);
-
-  width: 2.35rem;
-  height: 2.35rem;
-  padding: 0 !important;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  color: var(--accent) !important;
+/* Accordion: top helper content */
+.info-accordion {
+  margin: 0 auto 1rem auto;
+  max-width: 60rem;
 }
 
-#openInfo:hover {
-  background: rgba(180, 83, 9, 0.06) !important;
-  border-color: rgba(180, 83, 9, 0.45) !important;
-}
-
-/* Modal: simple surface */
-#infoModal article {
-  max-height: min(80vh, 48rem);
-  overflow: auto;
-  overscroll-behavior: contain;
-
+.info-accordion details {
   background: var(--surface) !important;
   border: 1px solid var(--border) !important;
+  border-radius: 0.75rem;
+  padding: 0.6rem 0.85rem;
   box-shadow: var(--pico-box-shadow);
-  border-radius: 1rem;
-
-  padding: 1.2rem 1.3rem 1.3rem 1.3rem !important;
 }
 
-#infoModal header p {
-  margin: 0;
+.info-accordion details + details {
+  margin-top: 0.6rem;
 }
 
-#infoModal header strong {
-  font-size: 1.02rem;
+.info-accordion summary {
+  gap: 0.01rem;
+  font-size: 0.85rem;
+  font-weight: 550;
+  letter-spacing: 0.01em;
+}
+
+.info-accordion summary:focus,
+.info-accordion summary:focus-visible,
+.info-accordion summary:active,
+.info-accordion details[open] > summary {
+  color: var(--text) !important;
+}
+
+.info-accordion h3 {
+  margin: 0.8rem 0 0.3rem 0;
+}
+
+.info-accordion p,
+.info-accordion ul,
+.info-accordion ol {
+  margin: 0.45rem 0 0.1rem 0;
+  font-size: 0.75rem;
+  color: rgba(31, 41, 55, 0.84);
 }
 
 /* --- Strategy area: smaller, cleaner typography --- */

@@ -27,23 +27,22 @@
   - [x] checkbox for steps
   - [x] loading: do not let user resend if still evaluating
   - [x] (mobile): b-red strategies component extends itself out of the form box
-  - [ ] improve the dropdown info -> maybe use accordion or fix modal
-  - [ ] everything seems so compressed, can we resolve that?
+  - [x] improve the dropdown info -> maybe use accordion or fix modal
   - [x] smaller font and more blackness on textarea part
   - [x] show beta-reductions -> use symbol
   - [x] link to prelude
   - [x] add WHNF to Call-by-name string strategy
+  - [ ] everything seems so compressed, can we resolve that?
   - [ ] add PS because equational reference might replace the output for something unexpected
   - [ ] check reliability of htmx/pico urls and versions
-  - [ ] even space between strategy options
   - [ ] change color pallete
 - [ ] Eval: improve show expr
-- [ ] UI: correct docs
 - [ ] UI: easter-egg strategy
+- [ ] UI: correct docs
 - [ ] deploy
   - [ ] as-package/containerize
   - [ ] VPS? deploy service?
-  - [ ] CI/CD (build + tests) + deployment
+  - [ ] CI/CD: (build + tests) + deployment
 - [ ] README docs
 - [ ] e2e (parser + eval)
 - [ ] tests for functions marked with `todo: test`
