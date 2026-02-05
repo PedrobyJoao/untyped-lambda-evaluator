@@ -46,27 +46,25 @@
 - [ ] README docs
 - [ ] e2e (parser + eval)
 - [ ] tests for functions marked with `todo: test`
-- [ ] Extra (I may not do it):
-  - [ ] SRI for pico/htmx urls
-  - [ ] UI: use Blaze-HTML in Web.Render instead of pure strings
-  - [ ] UI: copy button
-  - [ ] Indentation
-  - [ ] Evaluator: trace redexes insted of entire steps
-  - [ ] UI: run all b-red strategies and compare them
-  - [ ] Eval: Call by value
-  - [ ] QA: remove excess of different var names on tests, mainly `x'`, `y'`...
-  - [ ] UI: automatically convert backslash to lambda
-  - [ ] UI:statistics: number of alpha renamings
-  - [ ] Evaluator: HOAS and de Bruijn index?
-  - [ ] Parser: Syntax sugar for multiple args (`\x y z.`)
+- [ ] Extra:
   - [ ] Optimal evaluator
     - [ ] have trace building optional
     - [ ] a better algorithm
     - [ ] might include memoization of subterms and their normal forms
     - [ ] Concurrent eval of `App` terms in `App e1 e2`
+  - [ ] SRI for pico/htmx urls
+  - [ ] UI: use Blaze-HTML in Web.Render instead of pure strings
+  - [ ] UI: run all b-red strategies and compare them
+  - [ ] Indentation
+  - [ ] Eval: Call by value
+  - [ ] Evaluator: trace redexes insted of entire steps
+  - [ ] QA: remove excess of different var names on tests, mainly `x'`, `y'`...
+  - [ ] Evaluator: HOAS and de Bruijn index?
+  - [ ] Parser: Syntax sugar for multiple args (`\x y z.`)
   - [ ] Statistics: memory usage  
          Memory usage stats is usually process wise with Haskell tools (e.g.: GHC RTS),
         so it's only more or less reliable if we execute the eval func in a separate process.
+  - [ ] UI:statistics: number of alpha renamings
 
 ## Learn more here:
 
