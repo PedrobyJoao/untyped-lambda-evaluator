@@ -2,8 +2,9 @@
 
 ## Core
 
-- [ ] UI: correct docs
-  - [x] add PS because equational reference might replace the output for something unexpected
+- [ ] UI: How to use
+- [ ] UI: About
+- [ ] UI: Jotapex -> Call-by-value (keep easter egg)
 - [ ] deploy
   - [ ] as-package/containerize
   - [ ] VPS? deploy service?
