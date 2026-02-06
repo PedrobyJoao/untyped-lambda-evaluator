@@ -101,7 +101,7 @@ spec = do
 
   describe "Full beta reduction: Single-step reduction order" $ do
     let applicativeNoTrace = fmap fst . applicative
-    describe "Applicative Order (rightmost innermost first)" $ do
+    describe "Applicative Order (leftmost innermost first)" $ do
       -- (λx.x b) ((λy.y) a)
       -- Applicative should reduce the argument first: ((λy.y) a) -> a
       -- Result after 1 step: (λx.x b) a
@@ -119,11 +119,13 @@ spec = do
                            (Just (App (Lam x (Var x)) (Var a)))
 
       -- ((λx.x) a) ((λy.y) b)
-      -- Applicative: rightmost innermost first, so reduce ((λy.y) b) -> b
-      it "reduces rightmost redex first in application" $ do
-        let expr = App (App (Lam x (Var x)) (Var a)) (App (Lam y (Var y)) (Var b))
+      -- Applicative: leftmost innermost first, so reduce ((λx.x) a) -> a
+      it "reduces leftmost redex first in application" $ do
+        let leftRedex = App (Lam x (Var x)) (Var a)
+            rightRedex = (App (Lam y (Var y)) (Var b))
+            expr = App leftRedex rightRedex
         shouldAlphaEqJust (applicativeNoTrace expr)
-                          (Just (App (App (Lam x (Var x)) (Var a)) (Var b)))
+                          (Just (App (Var a) rightRedex))
 
     describe "Normal Order (leftmost outermost first)" $ do
       let normalOrderNoTrace = fmap fst . normalOrder

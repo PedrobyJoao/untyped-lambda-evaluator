@@ -114,7 +114,7 @@ reduceFn NormalOrder = normalOrder
 
 -- * Applicative *
 --
--- Reduces first the rightmost innermost redex.
+-- Reduces first the leftmost innermost redex.
 -- Thus arguments are reduced before being applied
 -- to their related function.
 --
@@ -129,8 +129,8 @@ applicative (Lam v e) = do
   (e', ars) <- applicative e
   Just (Lam v e', ars)
 applicative (App e1 e2)
-  | Just (e2', ars) <- applicative e2 = Just (App e1 e2', ars)
   | Just (e1', ars) <- applicative e1 = Just (App e1' e2, ars)
+  | Just (e2', ars) <- applicative e2 = Just (App e1 e2', ars)
   | Lam v body <- e1 = Just $ substitute v body e2
   | otherwise = Nothing
 
@@ -138,7 +138,7 @@ applicative (App e1 e2)
 --
 -- Reduces first the leftmost outermost redex.
 -- So arguments are replaced into functions before
--- being applied.
+-- being reduced.
 --
 -- `(\x.x b) ((\y.y) a)`
 -- 1 step: `((\y.y) a) b` ...
@@ -347,7 +347,7 @@ instance Show Expr where
   show (Lam v e) =
     case e of
       Lam{} -> "λ" ++ show v ++ "." ++ show e
-      _ -> "λ" ++ show v ++ ". " ++ show e
+      _     -> "λ" ++ show v ++ ". " ++ show e
   show (App e1 e2)
     -- Var Var = a b
     -- Var Lam = a (\x.x)

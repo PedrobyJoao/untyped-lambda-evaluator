@@ -2,20 +2,19 @@
 
 ## Core
 
-- [ ] UI: truncated info
 - [ ] UI: correct docs
-  - [ ] add PS because equational reference might replace the output for something unexpected
+  - [x] add PS because equational reference might replace the output for something unexpected
 - [ ] deploy
   - [ ] as-package/containerize
   - [ ] VPS? deploy service?
   - [ ] CI/CD: (build + tests) + deployment
 - [ ] README docs
 - [ ] tests for functions marked with `todo: test`
-- [ ] UI: responsive for ipad like devices
 
 ## Extra
 
 - [ ] Eval: Call by value
+- [ ] Eval: Call by need
 - [ ] Optimal evaluator
   - [ ] have trace building optional
   - [ ] a better algorithm
@@ -35,6 +34,7 @@
        Memory usage stats is usually process wise with Haskell tools (e.g.: GHC RTS),
       so it's only more or less reliable if we execute the eval func in a separate process.
 - [ ] UI:statistics: number of alpha renamings
+- [ ] UI: info button for each strategy with small description for each
 
 ## Done
 
