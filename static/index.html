@@ -115,30 +115,6 @@ add one two
                 <input type="radio" name="strategy" value="normal" checked />
                 <span>Normal order</span>
               </label>
-
-              <div class="hint-wrap">
-                <button
-                  type="button"
-                  class="hint"
-                  aria-label="Normal order strategy hint"
-                  aria-describedby="hint-normal"
-                >
-                  <svg
-                    class="ui-icon ui-icon--sm"
-                    aria-hidden="true"
-                    focusable="false"
-                  >
-                    <use
-                      href="/static/icons.svg#icon-help"
-                      xlink:href="/static/icons.svg#icon-help"
-                    ></use>
-                  </svg>
-                </button>
-                <div id="hint-normal" class="tooltip" role="tooltip">
-                  Leftmost outermost reduction. If a normal form exists, normal
-                  order will find it.
-                </div>
-              </div>
             </div>
 
             <div class="strategy-row">
@@ -146,30 +122,6 @@ add one two
                 <input type="radio" name="strategy" value="applicative" />
                 <span>Applicative order</span>
               </label>
-
-              <div class="hint-wrap">
-                <button
-                  type="button"
-                  class="hint"
-                  aria-label="Applicative order strategy hint"
-                  aria-describedby="hint-applicative"
-                >
-                  <svg
-                    class="ui-icon ui-icon--sm"
-                    aria-hidden="true"
-                    focusable="false"
-                  >
-                    <use
-                      href="/static/icons.svg#icon-help"
-                      xlink:href="/static/icons.svg#icon-help"
-                    ></use>
-                  </svg>
-                </button>
-                <div id="hint-applicative" class="tooltip" role="tooltip">
-                  Rightmost innermost reduction (arguments first). May diverge
-                  even when a normal form exists.
-                </div>
-              </div>
             </div>
 
             <div class="strategy-row">
@@ -177,31 +129,6 @@ add one two
                 <input type="radio" name="strategy" value="cbn" />
                 <span>Call-by-name (WHNF)</span>
               </label>
-
-              <div class="hint-wrap">
-                <button
-                  type="button"
-                  class="hint"
-                  aria-label="Call-by-name strategy hint"
-                  aria-describedby="hint-cbn"
-                >
-                  <svg
-                    class="ui-icon ui-icon--sm"
-                    aria-hidden="true"
-                    focusable="false"
-                  >
-                    <use
-                      href="/static/icons.svg#icon-help"
-                      xlink:href="/static/icons.svg#icon-help"
-                    ></use>
-                  </svg>
-                </button>
-                <div id="hint-cbn" class="tooltip" role="tooltip">
-                  Reduces only the leftmost outermost until a lambda, then
-                  applies arguments without reducing them. Does not reduce
-                  inside lambdas.
-                </div>
-              </div>
             </div>
 
             <div class="strategy-row">
@@ -209,30 +136,6 @@ add one two
                 <input type="radio" name="strategy" value="jotapex" />
                 <span>Jotapex (new)</span>
               </label>
-
-              <div class="hint-wrap">
-                <button
-                  type="button"
-                  class="hint"
-                  aria-label="Jotapex strategy hint"
-                  aria-describedby="hint-jotapex"
-                >
-                  <svg
-                    class="ui-icon ui-icon--sm"
-                    aria-hidden="true"
-                    focusable="false"
-                  >
-                    <use
-                      href="/static/icons.svg#icon-help"
-                      xlink:href="/static/icons.svg#icon-help"
-                    ></use>
-                  </svg>
-                </button>
-                <div id="hint-jotapex" class="tooltip" role="tooltip">
-                  A new β-Reduction strategy inspired on how bonobos choose
-                  their leader.
-                </div>
-              </div>
             </div>
           </fieldset>
 

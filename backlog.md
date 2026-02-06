@@ -10,8 +10,8 @@
   - [ ] VPS? deploy service?
   - [ ] CI/CD: (build + tests) + deployment
 - [ ] README docs
-- [ ] e2e (parser + eval)
 - [ ] tests for functions marked with `todo: test`
+- [ ] UI: responsive for ipad like devices
 
 ## Extra
 
@@ -74,3 +74,4 @@
   - [x] change color pallete
   - [x] check reliability of htmx/pico urls and versions
 - [x] Eval: improve show expr
+- [x] e2e (parser + eval)
