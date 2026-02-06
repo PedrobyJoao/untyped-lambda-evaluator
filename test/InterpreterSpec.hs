@@ -66,8 +66,16 @@ spec = do
       let out = "ok"
       it "does not evaluate omega under call-by-name" $
         expectOutput CallByName False exOmegaShortCircuit out
+      it "normal order (lazy) fully normalizes without trying to reduce omega" $
+        expectOutput NormalOrder False exOmegaShortCircuit out
 
     describe "Max steps" $ do
+      it "applicative does not guarantee termination even when the lam expr has a normal form" $
+        expectStopReason
+          Applicative
+          False
+          exOmegaShortCircuit
+          (MaxNumberOfSteps maxEvalSteps)
       it "stops at the step limit for a non-terminating program" $
         expectStopReason
           NormalOrder

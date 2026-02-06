@@ -1,4 +1,7 @@
 -- Call-by-name short-circuit with omega
+-- Normal Order fully normalizes it
+-- Applicative does not terminate
+
 let const = \x. \y. x
 let omega = (\x. x x) (\x. x x)
 
