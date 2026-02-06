@@ -1,0 +1,5 @@
+-- Call-by-name short-circuit with omega
+let const = \x. \y. x
+let omega = (\x. x x) (\x. x x)
+
+const ok omega

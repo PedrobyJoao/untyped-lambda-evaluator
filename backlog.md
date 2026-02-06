@@ -25,6 +25,7 @@
 - [ ] UI: run all b-red strategies and compare them
 - [ ] Indentation
 - [ ] Eval: Call by value
+- [ ] Performance: use Text instead of String
 - [ ] Evaluator: trace redexes insted of entire steps
 - [ ] QA: remove excess of different var names on tests, mainly `x'`, `y'`...
 - [ ] Evaluator: HOAS and de Bruijn index?

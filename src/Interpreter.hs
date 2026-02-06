@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Interpreter (interpret) where
+module Interpreter (interpret, WithPrelude) where
 
 import qualified Data.Map.Strict as M
 import qualified Data.Text.Lazy  as TL

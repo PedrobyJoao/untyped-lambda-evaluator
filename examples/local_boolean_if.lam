@@ -1,0 +1,6 @@
+-- Local booleans and if
+let true = \t. \f. t
+let false = \t. \f. f
+let if = \p. \a. \b. p a b
+
+if true yes no

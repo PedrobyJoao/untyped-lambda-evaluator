@@ -1,0 +1,4 @@
+-- Forward references and output name resolution
+let result = zeta
+let zeta = ok
+result

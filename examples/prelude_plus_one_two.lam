@@ -1,0 +1,3 @@
+-- Church numeral addition from prelude
+let result = plus one two
+result

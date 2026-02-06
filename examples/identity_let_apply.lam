@@ -1,0 +1,3 @@
+-- Identity via local let-binding
+let id = \x. x
+id y

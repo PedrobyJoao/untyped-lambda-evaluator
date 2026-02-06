@@ -1,0 +1,4 @@
+-- Shadow prelude id and apply
+let id = \x. x x
+
+id z

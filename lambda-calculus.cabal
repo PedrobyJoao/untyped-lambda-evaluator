@@ -56,13 +56,16 @@ test-suite lambda-calculus-test
         AlphaEqSpec
         ParserSpec
         EvalWithTraceSpec
+        InterpreterSpec
         TestFixtures
     hs-source-dirs:   test
     build-depends:
         base ^>=4.20.2.0,
         hspec,
+        text,
         hspec-discover,
         megaparsec,
         containers,
+        filepath,
         lambda-calculus
     build-tool-depends: hspec-discover:hspec-discover
