@@ -2,7 +2,7 @@
 
 ## Core
 
-- [ ] UI: easter-egg strategy
+- [ ] UI: truncated info
 - [ ] UI: correct docs
   - [ ] add PS because equational reference might replace the output for something unexpected
 - [ ] deploy
@@ -15,16 +15,17 @@
 
 ## Extra
 
+- [ ] Eval: Call by value
 - [ ] Optimal evaluator
   - [ ] have trace building optional
   - [ ] a better algorithm
   - [ ] might include memoization of subterms and their normal forms
   - [ ] Concurrent eval of `App` terms in `App e1 e2`
+- [ ] tests: More realistic e2e tests (with more interesting examples)
 - [ ] SRI for pico/htmx urls
 - [ ] UI: use Blaze-HTML in Web.Render instead of pure strings
 - [ ] UI: run all b-red strategies and compare them
 - [ ] Indentation
-- [ ] Eval: Call by value
 - [ ] Performance: use Text instead of String
 - [ ] Evaluator: trace redexes insted of entire steps
 - [ ] QA: remove excess of different var names on tests, mainly `x'`, `y'`...

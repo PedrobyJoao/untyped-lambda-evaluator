@@ -1,15 +1,18 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 module Web.App
-  ( runApp
-  ) where
+  ( runApp,
+  )
+where
 
 import           Control.Exception             (SomeException)
 import           Control.Monad.IO.Class        (liftIO)
 import qualified Data.Text.Lazy                as TL
 import           Interpreter                   (interpret)
 import           Named                         (BetaReduction (..),
-                                                EvalResult (..), Trace (..))
+                                                EvalResult (..),
+                                                EvalStopReason (NoMoreReductions),
+                                                Trace (..))
 import           Network.Wai.Middleware.Static (Policy, hasPrefix,
                                                 isNotAbsolute, noDots,
                                                 staticPolicy, (>->))
@@ -38,43 +41,47 @@ postEval = do
   exprTxt <- formParam "expr" :: ActionM TL.Text
   stratTxt <- formParam "strategy" :: ActionM TL.Text
 
-  withPreludeTxt <- (formParam "withPrelude" :: ActionM TL.Text)
-    `catch` onMissingCheckbox
-  showStepsTxt <- (formParam "showSteps" :: ActionM TL.Text)
-    `catch` onMissingCheckbox
+  withPreludeTxt <-
+    (formParam "withPrelude" :: ActionM TL.Text)
+      `catch` onMissingCheckbox
+  showStepsTxt <-
+    (formParam "showSteps" :: ActionM TL.Text)
+      `catch` onMissingCheckbox
 
   let withPrelude = isChecked withPreludeTxt
   let showSteps = isChecked showStepsTxt
 
-  case parseStrategy stratTxt of
-    Left stratErr ->
-      html $ renderOutputOnly stratErr
+  if TL.toLower (TL.strip stratTxt) == "jotapex"
+    then html $ renderJotapex
 
-    Right strategy -> do
-      result <- liftIO $ interpret strategy withPrelude (TL.unpack exprTxt)
-      case result of
-        Left errTxt ->
-          html $ renderOutputOnly errTxt
-        Right (outputTxt, evalRes, elapsedNs) -> do
-          let Trace steps = evalTrace evalRes
-          let stepsCount = length steps
+    else case parseStrategy stratTxt of
+      Left stratErr ->
+        html $ renderOutputOnly stratErr
+      Right strategy -> do
+        result <- liftIO $ interpret strategy withPrelude (TL.unpack exprTxt)
+        case result of
+          Left errTxt ->
+            html $ renderOutputOnly errTxt
+          Right (outputTxt, evalRes, elapsedNs) -> do
+            let Trace steps = evalTrace evalRes
+            let stepsCount = length steps
 
-          if showSteps && stepsCount > 0
-            then
-              html $
-                renderOutputAndStatisticsAndSteps
-                  outputTxt
-                  elapsedNs
-                  stepsCount
-                  (stopReason evalRes)
-                  (evalTrace evalRes)
-            else
-              html $
-                renderOutputAndStatistics
-                  outputTxt
-                  elapsedNs
-                  stepsCount
-                  (stopReason evalRes)
+            if showSteps && stepsCount > 0
+              then
+                html $
+                  renderOutputAndStatisticsAndSteps
+                    outputTxt
+                    elapsedNs
+                    stepsCount
+                    (stopReason evalRes)
+                    (evalTrace evalRes)
+              else
+                html $
+                  renderOutputAndStatistics
+                    outputTxt
+                    elapsedNs
+                    stepsCount
+                    (stopReason evalRes)
 
 -- ============
 -- Process I/O

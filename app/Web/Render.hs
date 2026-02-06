@@ -4,7 +4,7 @@ module Web.Render where
 
 import           Data.List      (intersperse)
 import qualified Data.Text.Lazy as TL
-import           Named          (ElapsedNs, EvalStopReason, Trace)
+import           Named          (ElapsedNs, EvalStopReason (..), Trace)
 import           Text.Printf    (printf)
 
 -- ============
@@ -113,3 +113,18 @@ escapeHtml =
     '"'  -> "&quot;"
     '\'' -> "&#39;"
     _    -> TL.singleton c
+
+-- just an easter egg
+renderJotapex :: TL.Text
+renderJotapex = renderOutputAndStatistics
+                  msg
+                  0
+                  0
+                  NoMoreReductions
+    where msg = TL.unlines [
+              "breathe. be aware of the uniqueness of this very moment.",
+              "",
+              "feel the sensations of the air entering your nostrils.",
+              "",
+              "enjoy our ephemeral conscious experience."
+              ]
