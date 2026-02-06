@@ -353,16 +353,64 @@ h1 {
   color: var(--text) !important;
 }
 
-.info-accordion h3 {
-  margin: 0.8rem 0 0.3rem 0;
+.info-accordion h3,
+.info-accordion h4,
+.info-accordion h5,
+.info-accordion h6 {
+  margin: 0.75rem 0 0.25rem 0;
+  letter-spacing: -0.01em;
+}
+
+.info-accordion h4 {
+  font-size: 0.95rem;
+}
+
+.info-accordion h5 {
+  font-size: 0.85rem;
+}
+
+.info-accordion h6 {
+  font-size: 0.8rem;
 }
 
 .info-accordion p,
 .info-accordion ul,
-.info-accordion ol {
-  margin: 0.45rem 0 0.1rem 0;
+.info-accordion ol,
+.info-accordion blockquote {
+  margin: 0.6rem 0 0.1rem 0 !important;
   font-size: 0.75rem;
   color: rgba(28, 35, 43, 0.84);
+}
+
+.info-accordion blockquote {
+  margin: 0.4rem 0 0.35rem 0 !important;
+  padding: 0.35rem 0.7rem !important;
+  border-left-width: 0.2rem;
+  background: transparent !important;
+}
+
+.info-accordion blockquote > p {
+  margin: 0.15rem 0 !important;
+}
+
+.info-accordion pre {
+  margin: 0.35rem 0 0.25rem 0 !important;
+  padding: 0.6rem 0.75rem !important;
+  font-size: 0.72rem !important;
+  line-height: 1.35 !important;
+}
+
+.info-accordion pre code {
+  font-size: 0.72rem !important;
+  background: transparent !important;
+  padding: 0 !important;
+}
+
+.info-accordion p + pre,
+.info-accordion blockquote + pre,
+.info-accordion ul + pre,
+.info-accordion ol + pre {
+  margin-top: 0.25rem !important;
 }
 
 /* --- Strategy area: smaller, cleaner typography --- */

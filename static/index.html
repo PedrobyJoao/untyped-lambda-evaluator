@@ -37,37 +37,171 @@
         <details>
           <summary>About</summary>
           <p>
-            This app parses and evaluates lambda calculus expressions using
-            different β-reduction strategies.
+            Lambda calculus is a formal system for representing computation
+            created by Alonzo Church in 1930s. If you think as a programming
+            language, it's turing complete.
           </p>
-          <h3>How to use</h3>
-          <ol>
-            <li>Enter a lambda expression (example: <code>\x. x</code>).</li>
-            <li>Select a reduction strategy.</li>
-            <li>Press <strong>Evaluate</strong> to normalize.</li>
-          </ol>
-
-          <h3>Syntax</h3>
+            <p>
+              As a rewriting system, untyped lambda calculus is not strongly
+              normalizing. Meaning that there are terms with no normal form such
+              as: <code>(\x.x x) (\x.x x)</code>
+            </p> 
+          <p>
+            And here you have a tool to play with the evaluation/normalization
+            of lambda calculus expressions.
+          </p>
+          <h4>How to use</h4>
+          <p>The format of your program must be:</p>
           <ul>
-            <li>Lambda: <code>\x. body</code></li>
-            <li>Application: <code>f x</code> (use parentheses as needed)</li>
-            <li>Variables: <code>x</code>, <code>foo</code>, etc.</li>
+            <li><strong>0</strong> or <strong>n</strong> let bindings</li>
+            <li><strong>1</strong> final expression to be evaluated</li>
           </ul>
 
-          <h3>β-reduction strategies</h3>
+          <h5>Equational referencing</h5>
+          <p>
+            It includes equational referencing, so instead of writing one big
+            lambda expression, you can define certain expressions with names (as
+            <code>let id = \x.x</code>) and reuse them anywhere.
+          </p>
+          <p>
+            Before evaluation, the names will be expanded into their pure lambda
+            expression definition.
+          </p>
+          <blockquote>
+            <p>PS: let binding definitions can not be recursive.</p>
+            e.g.: <code>let f = \x. f x</code> is not allowed.
+          </blockquote>
+
+          <h4>Beta-reduction</h4>
+          <p>
+            A Beta-reduction is one reduction step of an application between an
+            abstraction and an expression.
+          </p>
+          <blockquote>
+            <p>Note: a <em>redex</em> is any expression in the form
+            <code>(\x.t) e</code></p>
+          </blockquote>
+          <p>
+            <code>(\x. x y) &lt;expr&gt;</code>. Here, <code>x</code> is
+            substituted for <code>&lt;expr&gt;</code> in the body of the
+            abstraction. Thus <code>&lt;expr&gt; y</code>.
+          </p>
+          <p>
+            The tool supports evaluation with three beta-reduction strategies,
+            two strong and one weak.
+          </p>
+          <blockquote>
+            <p>
+              Strong reduction: it reduces under lambdas. It can reach normal
+              form if it terminates.
+            </p>
+            <p>
+              Weak reduction: it does NOT reduce under lambdas. It's still
+              possible to find the normal form using weak reduction strategies
+              depending on the expression (if they do not require reducing under
+              lambdas). But if not, the last weak reduction results in a Weak
+              Head Normal Form (WHNF).
+            </p>
+          </blockquote>
+
+          <h5>Normal Order (Strong, Non-Strict):</h5>
+          <p>It reduces first the <em>leftmost outermost</em> redex.</p>
+          <p>
+            Arguments are substituted into the abstraction body before being
+            reduced.
+          </p>
+          <pre><code class="language-hs">let f = \a. a b c
+let arg = (\x.x) y -- not in normal form, it can be reduced
+
+f arg
+
+-- ONE beta-reduction step outputs:
+
+arg b c
+-- or
+((\x.x) y) b c
+</code></pre>
+          <p>
+            Normal Order reduction is normalizing, meaning it's guaranteed to
+            reduce until normal form if such term has a normal form.
+          </p>
+
+          <h5>Applicative (Strong, Strict):</h5>
+          <p>It reduces first the <em>leftmost innermost</em> redex.</p>
+          <p>Arguments are reduced first, and then substituted.</p>
+          <pre><code class="language-hs">let f = \a. a b c
+let arg = (\x.x) y -- not in normal form, it can be reduced
+
+f arg
+
+-- ONE beta-reduction step outputs:
+
+f y
+-- or
+(\a. a b c) y
+</code></pre>
+
+          <h6>Applicative is not normalizing</h6>
+          <p>
+            Applicative does not guarantee to reduce until normal form if one
+            exists.
+          </p>
+          <pre><code class="language-hs">let const = \x. \y. x
+let omega = (\x. x x) (\x. x x)
+
+const ok omega
+</code></pre>
+          <p>
+            Normal order fully normalizes the expression as it does not try to
+            reduce omega.
+          </p>
+          <p>
+            Applicative does not terminate because it tries to reduce omega
+            first.
+          </p>
+
+          <h5>Call-by-name (Weak, non-strict but it may recompute reductions)</h5>
+          <p>
+            It reduces only the leftmost outermost expression until it's a
+            lambda, and then it applies the arguments without reducing them.
+          </p>
+
+          <h4>Final notes</h4>
+          <ul>
+            <li>It does not feature eta-reductions.</li>
+            <li>
+              Call-by-value (Weak, Strict) and Call-by-need (Weak, Non-Strict)
+              to be implemented yet.
+            </li>
+          </ul>
+
+          <h4>Learn more here:</h4>
           <ul>
             <li>
-              <strong>Normal order</strong>: leftmost outermost first. If a
-              normal form exists, normal order will find it.
+              <a href="https://en.wikipedia.org/wiki/Lambda_calculus"
+                >https://en.wikipedia.org/wiki/Lambda_calculus</a
+              > (wikipedia)
             </li>
             <li>
-              <strong>Call-by-name (CBN)</strong>: like normal order, but does
-              not reduce inside lambdas.
+              <a href="https://serokell.io/blog/untyped-lambda-calculus"
+                >https://serokell.io/blog/untyped-lambda-calculus</a
+              > (serokell)
             </li>
             <li>
-              <strong>Applicative order</strong>: rightmost innermost first
-              (reduces arguments before applying). Can diverge even when a
-              normal form exists.
+              <a href="https://personal.utdallas.edu/~gupta/courses/apl/lambda.pdf"
+                >https://personal.utdallas.edu/~gupta/courses/apl/lambda.pdf</a
+            </li>
+            <li>
+              <a
+                href="https://www.cs.bu.edu/fac/snyder/cs320/Lectures/Lecture15--%20Lambda%20Calculus%20II.pdf"
+                >https://www.cs.bu.edu/fac/snyder/cs320/Lectures/Lecture15--%20Lambda%20Calculus%20II.pdf</a
+              >
+            </li>
+            <li>
+              <a
+                href="https://opendsa.cs.vt.edu/ODSA/Books/PL/html/ReductionStrategies.html"
+                >https://opendsa.cs.vt.edu/ODSA/Books/PL/html/ReductionStrategies.html</a
+              > (on beta reductions)
             </li>
           </ul>
         </details>
