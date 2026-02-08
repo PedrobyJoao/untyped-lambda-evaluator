@@ -4,7 +4,6 @@
 
 - [ ] UI: How to use
 - [ ] UI: About
-- [ ] UI: Jotapex -> Call-by-value (keep easter egg)
 - [ ] deploy
   - [ ] as-package/containerize
   - [ ] VPS? deploy service?

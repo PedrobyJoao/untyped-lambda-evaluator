@@ -21,7 +21,7 @@ data Expr = Var Var | App Expr Expr | Lam Var Expr
 newtype Var = MkVar String
   deriving (Eq, Ord, Generic, NFData)
 
-data BetaReduction = Applicative | NormalOrder | CallByName
+data BetaReduction = Applicative | NormalOrder | CallByName | CallByValue
   deriving (Show, Eq, Generic, NFData)
 
 data Trace = Trace [Step]

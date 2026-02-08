@@ -115,13 +115,17 @@ escapeHtml =
     _    -> TL.singleton c
 
 -- just an easter egg
-renderJotapex :: TL.Text
-renderJotapex = renderOutputAndStatistics
+renderCallByValue :: TL.Text
+renderCallByValue = renderOutputAndStatistics
                   msg
                   0
                   0
                   NoMoreReductions
     where msg = TL.unlines [
+              "not implemented yet. sorry.",
+              "",
+              "--",
+              "",
               "breathe. be aware of the uniqueness of this very moment.",
               "",
               "feel the sensations of the air entering your nostrils.",

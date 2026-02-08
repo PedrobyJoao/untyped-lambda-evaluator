@@ -10,9 +10,7 @@ import           Control.Monad.IO.Class        (liftIO)
 import qualified Data.Text.Lazy                as TL
 import           Interpreter                   (interpret)
 import           Named                         (BetaReduction (..),
-                                                EvalResult (..),
-                                                EvalStopReason (NoMoreReductions),
-                                                Trace (..))
+                                                EvalResult (..), Trace (..))
 import           Network.Wai.Middleware.Static (Policy, hasPrefix,
                                                 isNotAbsolute, noDots,
                                                 staticPolicy, (>->))
@@ -51,37 +49,37 @@ postEval = do
   let withPrelude = isChecked withPreludeTxt
   let showSteps = isChecked showStepsTxt
 
-  if TL.toLower (TL.strip stratTxt) == "jotapex"
-    then html $ renderJotapex
+  case parseStrategy stratTxt of
+    Left stratErr ->
+      html $ renderOutputOnly stratErr
+    Right strategy ->
+      if strategy == CallByValue
+        then html $ renderCallByValue
+        else do
+          result <- liftIO $ interpret strategy withPrelude (TL.unpack exprTxt)
+          case result of
+            Left errTxt ->
+              html $ renderOutputOnly errTxt
+            Right (outputTxt, evalRes, elapsedNs) -> do
+              let Trace steps = evalTrace evalRes
+              let stepsCount = length steps
 
-    else case parseStrategy stratTxt of
-      Left stratErr ->
-        html $ renderOutputOnly stratErr
-      Right strategy -> do
-        result <- liftIO $ interpret strategy withPrelude (TL.unpack exprTxt)
-        case result of
-          Left errTxt ->
-            html $ renderOutputOnly errTxt
-          Right (outputTxt, evalRes, elapsedNs) -> do
-            let Trace steps = evalTrace evalRes
-            let stepsCount = length steps
-
-            if showSteps && stepsCount > 0
-              then
-                html $
-                  renderOutputAndStatisticsAndSteps
-                    outputTxt
-                    elapsedNs
-                    stepsCount
-                    (stopReason evalRes)
-                    (evalTrace evalRes)
-              else
-                html $
-                  renderOutputAndStatistics
-                    outputTxt
-                    elapsedNs
-                    stepsCount
-                    (stopReason evalRes)
+              if showSteps && stepsCount > 0
+                then
+                  html $
+                    renderOutputAndStatisticsAndSteps
+                      outputTxt
+                      elapsedNs
+                      stepsCount
+                      (stopReason evalRes)
+                      (evalTrace evalRes)
+                else
+                  html $
+                    renderOutputAndStatistics
+                      outputTxt
+                      elapsedNs
+                      stepsCount
+                      (stopReason evalRes)
 
 -- ============
 -- Process I/O
@@ -91,8 +89,9 @@ parseStrategy :: TL.Text -> Either TL.Text BetaReduction
 parseStrategy t =
   case TL.toLower t of
     "normal"      -> Right NormalOrder
-    "cbn"         -> Right CallByName
     "applicative" -> Right Applicative
+    "cbn"         -> Right CallByName
+    "cbv"         -> Right CallByValue
     other         -> Left $ "Unknown strategy: " <> other
 
 isChecked :: TL.Text -> Bool
