@@ -34,6 +34,7 @@
       so it's only more or less reliable if we execute the eval func in a separate process.
 - [ ] UI:statistics: number of alpha renamings
 - [ ] UI: info button for each strategy with small description for each
+- [ ] QA: rename data type: BetaReduction -> ReductionStrategy
 
 ## Done
 
