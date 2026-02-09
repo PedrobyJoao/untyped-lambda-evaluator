@@ -8,34 +8,75 @@ turing complete.
 As a rewriting system, untyped lambda calculus is not strongly normalizing.  
 Meaning that there are terms with no normal form such as: `(\x.x x) (\x.x x)`
 
-## Beta-reduction
+Lambda calculus builds terms from three pieces: variables, abstractions, and applications.
 
-todo: improve section
+A **variable** is a name like `x`.
 
-A Beta-reduction is the name given to
+An **abstraction** `\x. t` is an anonymous function that binds `x` in the body `t`.
+
+And **application** `t s` means "apply `t` to `s`" (left-associative, so `f a b`
+means `(f a) b`).
+
+## β-reduction
+
+A _redex (reducible expression)_ is any application where the left side is an abstraction: `(\x. t) s`.
+
+Now, **β-reduction** is the substitution step upon a redex: `(\x. t) s -> t[x := s]`
+
+`t[x := s]` means: replace all occurrences of `x` in `t` by `s`.
+
+Example:
 
 ```hs
-(\x. x y) e
-
+(\x. x y) z -- a redex
+-- one β-reduction
+z y -- an application between two free variables
 ```
 
-> Note: a _redex_ is any expression in the form `(\x.t) e`
+## Normal Form
 
-`(\x. x y) <expr>`. Here, `x` is substituted for `<expr>` in the body of the abstraction.
+A term is in normal form when no beta-reduction applies, i.e. it has no subexpression
+of the form `(\x. t) s`, meaning it has no redexes.
 
-Thus `<expr> y`.
+For example, `(\x. x) y -> y`, and `y` is in normal form.
 
-The tool supports evaluation with three beta-reduction strategies, two strong and one weak.
+## Weak Head Normal Form (WHNF)
 
-Note that beta-reduction strategies differ in how they choose which redex to reduce first.
+A term is in WHNF when its _head is not a beta-redex_. Redexes may still appear
+inside arguments or inside lambda bodies.
 
-> Strong reduction: it reduces under lambdas. It can reach normal form
-> if it terminates.
+> Head: the leftmost term in a left-associative application chain.
 >
-> Weak reduction: it does NOT reduce under lambdas. It's still possible
-> to find the normal form using weak reduction strategies depending on the expression (
-> if they do not require reducing under lambdas).
-> But if not, the last weak reduction results in a Weak Head Normal Form (WHNF).
+> Example: `f a b` means `((f a) b)`, so the head is `f`.
+
+```hs
+-- WHNF:
+\x. (\y. y) x
+f ((\x. x) y)
+x y z
+
+-- Not WHNF (head redex):
+(\x. x) y
+((\x. x) y)
+```
+
+## Reduction strategies
+
+Reduction strategies differ in how they choose which redex to reduce first.
+
+They can be _strong_ or _weak_.
+
+_Strong_: it reduces under lambdas. It can reach normal form
+if it terminates.
+
+_Weak_: it does NOT reduce under lambdas. It's still possible
+to find the normal form if the expression doesn't require reducing under lambdas).
+Otherwise, the last weak reduction results in the Weak Head Normal Form (WHNF)
+of the expression
+
+A few reduction strategies are: Normal Order, Applicative, Call-by-name, and Call-by-value.
+
+todo: normal order and applicative are confluent.
 
 ### Normal Order (Strong, Non-Strict):
 
@@ -57,7 +98,7 @@ arg b c
 ```
 
 Normal Order reduction is normalizing, meaning it's guaranteed to reduce until normal form
-if such term has a normal form.
+if one exists.
 
 ### Applicative (Strong, Strict):
 
@@ -80,7 +121,7 @@ f y
 
 #### Applicative is not normalizing
 
-Applicative does not guarantee to reduce until normal form if one exists.
+Applicative does not guarantee reduction until normal form even if one exists.
 
 ```hs
 let const = \x. \y. x
@@ -91,7 +132,8 @@ const ok omega
 
 Normal order fully normalizes the expression as it does not try to reduce omega.
 
-Applicative does not terminate because it tries to reduce omega first.
+Applicative does not terminate because it tries to reduce omega first,
+getting stuck in infinite recursion.
 
 ### Call-by-name (Weak, non-strict but it may recompute reductions)
 
@@ -99,10 +141,13 @@ It reduces only the leftmost outermost expression until
 it's a lambda, and then it applies the arguments without
 reducing them.
 
+todo: add example to call-by-name
+
 ## Learn more here:
 
-- https://en.wikipedia.org/wiki/Lambda_calculus (html link -> wikipedia)
-- https://serokell.io/blog/untyped-lambda-calculus (html link -> serokell)
+- https://serokell.io/blog/untyped-lambda-calculus
+- https://en.wikipedia.org/wiki/Lambda_calculus
 - https://personal.utdallas.edu/~gupta/courses/apl/lambda.pdf
 - https://www.cs.bu.edu/fac/snyder/cs320/Lectures/Lecture15--%20Lambda%20Calculus%20II.pdf
-- https://opendsa.cs.vt.edu/ODSA/Books/PL/html/ReductionStrategies.html (html link -> on beta reductions)
+- https://opendsa.cs.vt.edu/ODSA/Books/PL/html/ReductionStrategies.html
+- https://j-hui.com/pages/normal-forms/

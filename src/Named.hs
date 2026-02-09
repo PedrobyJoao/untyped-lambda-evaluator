@@ -159,6 +159,9 @@ normalOrder (App e1 e2)
 -- it's a lambda, and then it applies the arguments without
 -- reducing them.
 --
+-- If the head (first term) is just a variable, it's already
+-- then in Weak Head Normal Form.
+--
 -- Expressions within the lambda term are not reduced.
 callByName :: Expr -> Maybe (Expr, [AlphaRenaming])
 callByName (Var _) = Nothing

@@ -2,8 +2,6 @@
 
 ## Core
 
-- [ ] UI: How to use
-- [ ] UI: About
 - [ ] deploy
   - [ ] as-package/containerize
   - [ ] VPS? deploy service?
@@ -13,6 +11,7 @@
 
 ## Extra
 
+- [ ] UI: About Lambda Calculus accordion (a bit of theory)
 - [ ] Eval: Call by value
 - [ ] Eval: Call by need
 - [ ] Optimal evaluator
@@ -75,3 +74,4 @@
   - [x] check reliability of htmx/pico urls and versions
 - [x] Eval: improve show expr
 - [x] e2e (parser + eval)
+- [x] UI: How to use
