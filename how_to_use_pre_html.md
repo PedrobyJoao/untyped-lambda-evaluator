@@ -3,27 +3,41 @@
 
 ## How to use
 
-todo: prelude
-todo: equational referencing confusion output
-todo: optionally see beta reduction steps checking the checkbox
+Write a program with the following format:
 
-The format of your program must be:
+- **any** let bindings
+- **one** final expression to be evaluated
 
-- **0** or **n** let bindings
-- **1** final expression to be evaluated
+Then choose a beta-reduction strategy, optionally enable
+logging of beta reduction steps, and evaluate.
+
+> To understand more about the beta-reduction strategies,
+> see the "About λ-Calculus" section.
+
+A prelude with a few useful definitions (combinators, church numbers, etc) can be included. (link: https://github.com/PedrobyJoao/untyped-lambda-evaluator/blob/main/static/prelude.lam)
+
+When the prelude is included, user's definitions can overwritte prelude's when they
+share the same name.
+
+Now, regarding lambda syntax: the lambda symbol can be written as either `\` or `λ` as in `\x.x` or `λx.x`
 
 ### Equational referencing
 
-It includes equational referencing, so instead of writing one
-big lambda expression, you can define certain expressions with
-names (as `let id = \x.x`) and reuse them anywhere.
+As already mentioned, it includes equational referencing, so instead of writing one
+big lambda expression, expressions can be "assigned" to names (as `let id = λx.x`) and reused anywhere.
 
-Before evaluation, the names will be expanded into their pure lambda
-expression definition.
+Before evaluation, references will be replaced by their pure lambda expression representation.
 
-> PS: let binding definitions can not be recursive.
+> PS: let definitions can _not_ be recursive.
 >
-> Thus `let f = \x. f x` is not allowed.
+> Thus `let f = λx. f x` is not allowed.
+
+_After evaluation, we also replace the final expression with a loaded reference
+if any is alpha-equivalent_.
+
+> Possible confusion point: if prelude is included, the resultant expression
+> can be something unexpected: a term defined in the prelude (such as `zero`
+> which is `λf.λx.x`).
 
 ## Final notes
 
