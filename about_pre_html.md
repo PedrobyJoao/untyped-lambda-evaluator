@@ -23,7 +23,12 @@ A _redex (reducible expression)_ is any application where the left side is an ab
 
 Now, **β-reduction** is the substitution step upon a redex: `(\x. t) s -> t[x := s]`
 
-`t[x := s]` means: replace all occurrences of `x` in `t` by `s`.
+`t[x := s]` means: replace all occurrences of `s` for the free occurrences of `x` in `t`.
+
+> Free occurence refers to a variable that is not bound to any previous abstraction.
+>
+> The replacement process includes something called capture-avoiding substitution.
+> You may check out more about it in the "Learn more here" section.
 
 Example:
 
@@ -58,6 +63,7 @@ x y z
 -- Not WHNF (head redex):
 (\x. x) y
 ((\x. x) y)
+((\x. x) y) z
 ```
 
 ## Reduction strategies
@@ -157,6 +163,24 @@ const arg
 
 -- This stops at WHNF (a lambda), even though the body still has a redex.
 -- Thus, for Call-by-Name, there are no more reductions be applied.
+```
+
+### Call-by-value (Weak, strict)
+
+It reduces the leftmost outermost redex only after first reducing the argument to a value.
+It does NOT reduce under lambdas as Call-by-Name.
+
+```hs
+let f = \x. \y. (\z. z) y
+let arg = (\u. u) (\v. v)
+
+f arg
+
+-- one step: call-by-value reduces the argument first
+(\x. \y. (\z. z) y) (\v. v) -- or f (\v.v)
+-- one step: then applies
+\y. (\z. z) y -- WHNF
+-- stops at WHNF (lambda head), even though the body still has a redex.
 ```
 
 ## Learn more here:

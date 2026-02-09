@@ -11,9 +11,9 @@
 
 ## Extra
 
-- [ ] UI: About Lambda Calculus accordion (a bit of theory)
 - [ ] Eval: Call by value
 - [ ] Eval: Call by need
+  - [ ] UI-About: Call-byNeed
 - [ ] Optimal evaluator
   - [ ] have trace building optional
   - [ ] a better algorithm
@@ -75,3 +75,4 @@
 - [x] Eval: improve show expr
 - [x] e2e (parser + eval)
 - [x] UI: How to use
+- [x] UI: About
