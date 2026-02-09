@@ -76,7 +76,9 @@ of the expression
 
 A few reduction strategies are: Normal Order, Applicative, Call-by-name, and Call-by-value.
 
-todo: normal order and applicative are confluent.
+> Note: Beta‑reduction is confluent (Church–Rosser), so if a term has a normal form, it is unique.
+>
+> Any strategy that terminates reaches the same normal form.
 
 ### Normal Order (Strong, Non-Strict):
 
@@ -141,7 +143,21 @@ It reduces only the leftmost outermost expression until
 it's a lambda, and then it applies the arguments without
 reducing them.
 
-todo: add example to call-by-name
+```hs
+let const = \x. \y. x
+let arg = (\z. z) w
+
+const arg
+
+-- ONE beta-reduction step outputs:
+
+\y. arg
+-- or
+\y. ((\z. z) w)
+
+-- This stops at WHNF (a lambda), even though the body still has a redex.
+-- Thus, for Call-by-Name, there are no more reductions be applied.
+```
 
 ## Learn more here:
 
