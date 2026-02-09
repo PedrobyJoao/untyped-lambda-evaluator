@@ -36,74 +36,191 @@
       <section class="info-accordion" aria-label="About and help">
         <details>
           <summary>How to use</summary>
+          <p>Write a program with the following format:</p>
+          <ul>
+            <li><strong>any</strong> let bindings</li>
+            <li><strong>one</strong> final expression to be evaluated</li>
+          </ul>
+          <p>
+            Then choose a beta-reduction strategy, optionally enable logging of
+            beta reduction steps, and evaluate.
+          </p>
+          <blockquote>
+            <p>
+              To understand more about the beta-reduction strategies, see the
+              "About λ-Calculus" section.
+            </p>
+          </blockquote>
+          <p>
+            A
+            <a
+              href="https://github.com/PedrobyJoao/untyped-lambda-evaluator/blob/main/static/prelude.lam"
+              >prelude</a
+            >
+            with a few useful definitions (combinators, church numbers, etc) can
+            be included.
+          </p>
+          <p>
+            When the prelude is included, user's definitions can overwritte
+            prelude's when they share the same name.
+          </p>
+          <p>
+            Now, regarding lambda syntax: the lambda symbol can be written as
+            either <code>\</code> or <code>λ</code> as in <code>\x.x</code> or
+            <code>λx.x</code>
+          </p>
+          <h5>Equational referencing</h5>
+          <p>
+            As already mentioned, it includes equational referencing, so instead
+            of writing one big lambda expression, expressions can be "assigned"
+            to names (as <code>let id = λx.x</code>) and reused anywhere.
+          </p>
+          <p>
+            Before evaluation, references will be replaced by their pure lambda
+            expression representation.
+          </p>
+          <blockquote>
+            <p>
+              PS: let definitions can <em>not</em> be recursive.<br />
+              Thus <code>let f = λx. f x</code> is not allowed.
+            </p>
+          </blockquote>
+          <p>
+            <em>
+              After evaluation, we also replace the final expression with a
+              loaded reference if any is alpha-equivalent </em
+            >.
+          </p>
+          <blockquote>
+            <p>
+              Possible confusion point: if prelude is included, the resultant
+              expression can be something unexpected: a term defined in the
+              prelude (such as <code>zero</code> which is <code>λf.λx.x</code>).
+            </p>
+          </blockquote>
+          <h4>Final notes</h4>
+          <ul>
+            <li>It does not feature eta-reductions.</li>
+            <li>
+              Call-by-value (Weak, Strict) and Call-by-need (Weak, Lazy) to be
+              implemented yet.
+            </li>
+          </ul>
+        </details>
+        <details>
+          <summary>About λ-calculus</summary>
           <p>
             Lambda calculus is a formal system for representing computation
             created by Alonzo Church in 1930s. If you think as a programming
             language, it's turing complete.
           </p>
-            <p>
-              As a rewriting system, untyped lambda calculus is not strongly
-              normalizing. Meaning that there are terms with no normal form such
-              as: <code>(\x.x x) (\x.x x)</code>
-            </p> 
           <p>
-            And here you have a tool to play with the evaluation/normalization
-            of lambda calculus expressions.
-          </p>
-          <h4>How to use</h4>
-          <p>The format of your program must be:</p>
-          <ul>
-            <li><strong>0</strong> or <strong>n</strong> let bindings</li>
-            <li><strong>1</strong> final expression to be evaluated</li>
-          </ul>
-
-          <h5>Equational referencing</h5>
-          <p>
-            It includes equational referencing, so instead of writing one big
-            lambda expression, you can define certain expressions with names (as
-            <code>let id = \x.x</code>) and reuse them anywhere.
+            As a rewriting system, untyped lambda calculus is not strongly
+            normalizing. Meaning that there are terms with no normal form such
+            as: <code>(\x.x x) (\x.x x)</code>
           </p>
           <p>
-            Before evaluation, the names will be expanded into their pure lambda
-            expression definition.
+            Lambda calculus builds terms from three pieces: variables,
+            abstractions, and applications.
           </p>
-          <blockquote>
-            <p>PS: let binding definitions can not be recursive.</p>
-            e.g.: <code>let f = \x. f x</code> is not allowed.
-          </blockquote>
-
-          <h4>Beta-reduction</h4>
+          <p>A <strong>variable</strong> is a name like <code>x</code>.</p>
           <p>
-            A Beta-reduction is one reduction step of an application between an
-            abstraction and an expression.
-          </p>
-          <blockquote>
-            <p>Note: a <em>redex</em> is any expression in the form
-            <code>(\x.t) e</code></p>
-          </blockquote>
-          <p>
-            <code>(\x. x y) &lt;expr&gt;</code>. Here, <code>x</code> is
-            substituted for <code>&lt;expr&gt;</code> in the body of the
-            abstraction. Thus <code>&lt;expr&gt; y</code>.
+            An <strong>abstraction</strong> <code>\x. t</code> is an anonymous
+            function that binds <code>x</code> in the body <code>t</code>.
           </p>
           <p>
-            The tool supports evaluation with three beta-reduction strategies,
-            two strong and one weak.
+            And <strong>application</strong> <code>t s</code> means "apply
+            <code>t</code> to <code>s</code>" (left-associative, so
+            <code>f a b</code> means <code>(f a) b</code>).
+          </p>
+          <h4>β-reduction</h4>
+          <p>
+            A <em>redex (reducible expression)</em> is any application where the
+            left side is an abstraction: <code>(\x. t) s</code>.
+          </p>
+          <p>
+            Now, <strong>β-reduction</strong> is the substitution step upon a
+            redex: <code>(\x. t) s -&gt; t[x := s]</code>
+          </p>
+          <p>
+            <code>t[x := s]</code> means: replace all occurrences of
+            <code>s</code> for the free occurrences of <code>x</code> in
+            <code>t</code>.
           </p>
           <blockquote>
             <p>
-              Strong reduction: it reduces under lambdas. It can reach normal
-              form if it terminates.
-            </p>
-            <p>
-              Weak reduction: it does NOT reduce under lambdas. It's still
-              possible to find the normal form using weak reduction strategies
-              depending on the expression (if they do not require reducing under
-              lambdas). But if not, the last weak reduction results in a Weak
-              Head Normal Form (WHNF).
+              Free occurence refers to a variable that is not bound to any
+              previous abstraction.<br /><br />
+              The replacement process includes something called capture-avoiding
+              substitution. You may check out more about it in the "Learn more
+              here" section's links.
             </p>
           </blockquote>
+          <p>Example:</p>
+          <pre><code class="language-hs">(\x. x y) z -- a redex
+-- one β-reduction
+z y -- an application between two free variables
+</code></pre>
+          <h4>Normal Form</h4>
+          <p>
+            A term is in normal form when no beta-reduction applies, i.e. it has
+            no subexpression of the form <code>(\x. t) s</code>, meaning it has
+            no redexes.
+          </p>
+          <p>
+            For example, <code>(\x. x) y -&gt; y</code>, and <code>y</code> is
+            in normal form.
+          </p>
+          <h4>Weak Head Normal Form (WHNF)</h4>
+          <p>
+            A term is in WHNF when its <em>head is not a beta-redex</em>.
+            Redexes may still appear inside arguments or inside lambda bodies.
+          </p>
+          <blockquote>
+            <p>
+              Head: the leftmost term in a left-associative application
+              chain.<br />
+              Example: <code>f a b</code> means <code>((f a) b)</code>, so the
+              head is <code>f</code>.
+            </p>
+          </blockquote>
+          <pre><code class="language-hs">-- WHNF:
+\x. (\y. y) x
+f ((\x. x) y)
+x y z
 
+-- Not WHNF (head redex):
+(\x. x) y
+((\x. x) y)
+((\x. x) y) z
+</code></pre>
+          <h4>Reduction strategies</h4>
+          <p>
+            Reduction strategies differ in how they choose which redex to reduce
+            first.
+          </p>
+          <p>They can be <em>strong</em> or <em>weak</em>.</p>
+          <p>
+            <em>Strong</em>: it reduces under lambdas. It can reach normal form
+            if it terminates.
+          </p>
+          <p>
+            <em>Weak</em>: it does NOT reduce under lambdas. It's still possible
+            to find the normal form if the expression doesn't require reducing
+            under lambdas). Otherwise, the last weak reduction results in the
+            Weak Head Normal Form (WHNF) of the expression
+          </p>
+          <p>
+            A few reduction strategies are: Normal Order, Applicative,
+            Call-by-name, and Call-by-value.
+          </p>
+          <blockquote>
+            <p>
+              Note: beta‑reduction is confluent (Church–Rosser), so if a term
+              has a normal form, it is unique.<br />
+              Any strategy that terminates reaches the same normal form.
+            </p>
+          </blockquote>
           <h5>Normal Order (Strong, Non-Strict):</h5>
           <p>It reduces first the <em>leftmost outermost</em> redex.</p>
           <p>
@@ -123,9 +240,8 @@ arg b c
 </code></pre>
           <p>
             Normal Order reduction is normalizing, meaning it's guaranteed to
-            reduce until normal form if such term has a normal form.
+            reduce until normal form if one exists.
           </p>
-
           <h5>Applicative (Strong, Strict):</h5>
           <p>It reduces first the <em>leftmost innermost</em> redex.</p>
           <p>Arguments are reduced first, and then substituted.</p>
@@ -140,11 +256,10 @@ f y
 -- or
 (\a. a b c) y
 </code></pre>
-
           <h6>Applicative is not normalizing</h6>
           <p>
-            Applicative does not guarantee to reduce until normal form if one
-            exists.
+            Applicative does not guarantee reduction until normal form even if
+            one exists.
           </p>
           <pre><code class="language-hs">let const = \x. \y. x
 let omega = (\x. x x) (\x. x x)
@@ -157,39 +272,63 @@ const ok omega
           </p>
           <p>
             Applicative does not terminate because it tries to reduce omega
-            first.
+            first, getting stuck in infinite recursion.
           </p>
-
-          <h5>Call-by-name (Weak, non-strict but it may recompute reductions)</h5>
+          <h5>
+            Call-by-name (Weak, non-strict but it may recompute reductions)
+          </h5>
           <p>
             It reduces only the leftmost outermost expression until it's a
             lambda, and then it applies the arguments without reducing them.
           </p>
+          <pre><code class="language-hs">let const = \x. \y. x
+let arg = (\z. z) w
 
-          <h4>Final notes</h4>
-          <ul>
-            <li>It does not feature eta-reductions.</li>
-            <li>
-              Call-by-value (Weak, Strict) and Call-by-need (Weak, Non-Strict)
-              to be implemented yet.
-            </li>
-          </ul>
+const arg
 
+-- ONE beta-reduction step outputs:
+
+\y. arg
+-- or
+\y. ((\z. z) w)
+
+-- This stops at WHNF (a lambda), even though the body still has a redex.
+-- Thus, for Call-by-Name, there are no more reductions be applied.
+</code></pre>
+          <h5>Call-by-value (Weak, strict)</h5>
+          <p>
+            It reduces the leftmost outermost redex only after first reducing
+            the argument to a value. It does NOT reduce under lambdas as
+            Call-by-Name.
+          </p>
+          <pre><code class="language-hs">let f = \x. \y. (\z. z) y
+let arg = (\u. u) (\v. v)
+
+f arg
+
+-- one step: call-by-value reduces the argument first
+(\x. \y. (\z. z) y) (\v. v) -- or f (\v.v)
+-- one step: then applies
+\y. (\z. z) y -- WHNF
+-- stops at WHNF (lambda head), even though the body still has a redex.
+</code></pre>
           <h4>Learn more here:</h4>
           <ul>
             <li>
-              <a href="https://en.wikipedia.org/wiki/Lambda_calculus"
-                >https://en.wikipedia.org/wiki/Lambda_calculus</a
-              > (wikipedia)
-            </li>
-            <li>
               <a href="https://serokell.io/blog/untyped-lambda-calculus"
                 >https://serokell.io/blog/untyped-lambda-calculus</a
-              > (serokell)
+              >
             </li>
             <li>
-              <a href="https://personal.utdallas.edu/~gupta/courses/apl/lambda.pdf"
+              <a href="https://en.wikipedia.org/wiki/Lambda_calculus"
+                >https://en.wikipedia.org/wiki/Lambda_calculus</a
+              >
+            </li>
+            <li>
+              <a
+                href="https://personal.utdallas.edu/~gupta/courses/apl/lambda.pdf"
                 >https://personal.utdallas.edu/~gupta/courses/apl/lambda.pdf</a
+              >
             </li>
             <li>
               <a
@@ -201,13 +340,14 @@ const ok omega
               <a
                 href="https://opendsa.cs.vt.edu/ODSA/Books/PL/html/ReductionStrategies.html"
                 >https://opendsa.cs.vt.edu/ODSA/Books/PL/html/ReductionStrategies.html</a
-              > (on beta reductions)
+              >
+            </li>
+            <li>
+              <a href="https://j-hui.com/pages/normal-forms/"
+                >https://j-hui.com/pages/normal-forms/</a
+              >
             </li>
           </ul>
-        </details>
-        <details>
-          <summary>About λ-calculus</summary>
-          <p></p>
         </details>
       </section>
 
