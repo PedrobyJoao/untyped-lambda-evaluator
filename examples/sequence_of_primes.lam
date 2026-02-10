@@ -1,7 +1,6 @@
 -- Source: https://github.com/tromp/AIT/blob/master/characteristic_sequences/primes.lam
 
 -- Example used to test evals reaching the limit of beta reduction steps
-
 -- outputs characteristic sequence of primes
 
 let cons = \x. \y. \z. z x y
