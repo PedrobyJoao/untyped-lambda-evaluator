@@ -66,7 +66,7 @@
           </p>
           <p>
             Now, regarding lambda syntax: the lambda symbol can be written as
-            either <code>\</code> or <code>λ</code> as in <code>\x.x</code> or
+            either <code>\</code> or <code>λ</code> as in <code>λx.x</code> or
             <code>λx.x</code>
           </p>
           <h5>Equational referencing</h5>
@@ -100,10 +100,14 @@
           </blockquote>
           <h4>Final notes</h4>
           <ul>
-            <li>It does not feature eta-reductions.</li>
             <li>
               Call-by-value (Weak, Strict) and Call-by-need (Weak, Lazy) to be
               implemented yet.
+            </li>
+            <li>It does not feature eta-reductions.</li>
+            <li>
+              It's not possible to indent code. Use multiple lines for big
+              expressions or simplify with more let bindings.
             </li>
           </ul>
         </details>
@@ -117,7 +121,7 @@
           <p>
             As a rewriting system, untyped lambda calculus is not strongly
             normalizing. Meaning that there are terms with no normal form such
-            as: <code>(\x.x x) (\x.x x)</code>
+            as: <code>(λx.x x) (λx.x x)</code>
           </p>
           <p>
             Lambda calculus builds terms from three pieces: variables,
@@ -125,7 +129,7 @@
           </p>
           <p>A <strong>variable</strong> is a name like <code>x</code>.</p>
           <p>
-            An <strong>abstraction</strong> <code>\x. t</code> is an anonymous
+            An <strong>abstraction</strong> <code>λx. t</code> is an anonymous
             function that binds <code>x</code> in the body <code>t</code>.
           </p>
           <p>
@@ -136,11 +140,11 @@
           <h4>β-reduction</h4>
           <p>
             A <em>redex (reducible expression)</em> is any application where the
-            left side is an abstraction: <code>(\x. t) s</code>.
+            left side is an abstraction: <code>(λx. t) s</code>.
           </p>
           <p>
             Now, <strong>β-reduction</strong> is the substitution step upon a
-            redex: <code>(\x. t) s -&gt; t[x := s]</code>
+            redex: <code>(λx. t) s -&gt; t[x := s]</code>
           </p>
           <p>
             <code>t[x := s]</code> means: replace all occurrences of
@@ -157,18 +161,18 @@
             </p>
           </blockquote>
           <p>Example:</p>
-          <pre><code class="language-hs">(\x. x y) z -- a redex
+          <pre><code class="language-hs">(λx. x y) z -- a redex
 -- one β-reduction
 z y -- an application between two free variables
 </code></pre>
           <h4>Normal Form</h4>
           <p>
             A term is in normal form when no beta-reduction applies, i.e. it has
-            no subexpression of the form <code>(\x. t) s</code>, meaning it has
+            no subexpression of the form <code>(λx. t) s</code>, meaning it has
             no redexes.
           </p>
           <p>
-            For example, <code>(\x. x) y -&gt; y</code>, and <code>y</code> is
+            For example, <code>(λx. x) y -&gt; y</code>, and <code>y</code> is
             in normal form.
           </p>
           <h4>Weak Head Normal Form (WHNF)</h4>
@@ -185,14 +189,14 @@ z y -- an application between two free variables
             </p>
           </blockquote>
           <pre><code class="language-hs">-- WHNF:
-\x. (\y. y) x
-f ((\x. x) y)
+λx. (λy. y) x
+f ((λx. x) y)
 x y z
 
 -- Not WHNF (head redex):
-(\x. x) y
-((\x. x) y)
-((\x. x) y) z
+(λx. x) y
+((λx. x) y)
+((λx. x) y) z
 </code></pre>
           <h4>Reduction strategies</h4>
           <p>
@@ -227,8 +231,8 @@ x y z
             Arguments are substituted into the abstraction body before being
             reduced.
           </p>
-          <pre><code class="language-hs">let f = \a. a b c
-let arg = (\x.x) y -- not in normal form, it can be reduced
+          <pre><code class="language-hs">let f = λa. a b c
+let arg = (λx.x) y -- not in normal form, it can be reduced
 
 f arg
 
@@ -236,7 +240,7 @@ f arg
 
 arg b c
 -- or
-((\x.x) y) b c
+((λx.x) y) b c
 </code></pre>
           <p>
             Normal Order reduction is normalizing, meaning it's guaranteed to
@@ -245,8 +249,8 @@ arg b c
           <h5>Applicative (Strong, Strict):</h5>
           <p>It reduces first the <em>leftmost innermost</em> redex.</p>
           <p>Arguments are reduced first, and then substituted.</p>
-          <pre><code class="language-hs">let f = \a. a b c
-let arg = (\x.x) y -- not in normal form, it can be reduced
+          <pre><code class="language-hs">let f = λa. a b c
+let arg = (λx.x) y -- not in normal form, it can be reduced
 
 f arg
 
@@ -254,15 +258,15 @@ f arg
 
 f y
 -- or
-(\a. a b c) y
+(λa. a b c) y
 </code></pre>
           <h6>Applicative is not normalizing</h6>
           <p>
             Applicative does not guarantee reduction until normal form even if
             one exists.
           </p>
-          <pre><code class="language-hs">let const = \x. \y. x
-let omega = (\x. x x) (\x. x x)
+          <pre><code class="language-hs">let const = λx. λy. x
+let omega = (λx. x x) (λx. x x)
 
 const ok omega
 </code></pre>
@@ -281,16 +285,16 @@ const ok omega
             It reduces only the leftmost outermost expression until it's a
             lambda, and then it applies the arguments without reducing them.
           </p>
-          <pre><code class="language-hs">let const = \x. \y. x
-let arg = (\z. z) w
+          <pre><code class="language-hs">let const = λx. λy. x
+let arg = (λz. z) w
 
 const arg
 
 -- ONE beta-reduction step outputs:
 
-\y. arg
+λy. arg
 -- or
-\y. ((\z. z) w)
+λy. ((λz. z) w)
 
 -- This stops at WHNF (a lambda), even though the body still has a redex.
 -- Thus, for Call-by-Name, there are no more reductions be applied.
@@ -301,15 +305,15 @@ const arg
             the argument to a value. It does NOT reduce under lambdas as
             Call-by-Name.
           </p>
-          <pre><code class="language-hs">let f = \x. \y. (\z. z) y
-let arg = (\u. u) (\v. v)
+          <pre><code class="language-hs">let f = λx. λy. (λz. z) y
+let arg = (λu. u) (λv. v)
 
 f arg
 
 -- one step: call-by-value reduces the argument first
-(\x. \y. (\z. z) y) (\v. v) -- or f (\v.v)
+(λx. λy. (λz. z) y) (λv. v) -- or f (λv.v)
 -- one step: then applies
-\y. (\z. z) y -- WHNF
+λy. (λz. z) y -- WHNF
 -- stops at WHNF (lambda head), even though the body still has a redex.
 </code></pre>
           <h4>Learn more here:</h4>
@@ -370,9 +374,9 @@ f arg
 
           <label for="expr" class="sr-only">Expression</label>
           <textarea id="expr" name="expr" rows="10" required>
--- Example format:
+-- Program format:
 -- 1) zero or more let bindings (definitions)
--- 2) a final expression to evaluate (the last non-comment line)
+-- 2) a final expression to be evaluated (the last non-comment line)
 
 -- Church numerals
 let one = \f.\x. f x
