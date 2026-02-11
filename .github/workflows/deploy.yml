@@ -17,10 +17,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: haskell/actions/setup@v2
+      - uses: haskell-actions/setup@v2
         with:
           ghc-version: '9.10.3'
-          cabal-version: '3.10.2.0'
+          cabal-version: '3.14'
       - name: Cabal update
         run: cabal update
       - name: Build
@@ -34,10 +34,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: haskell/actions/setup@v2
+      - uses: haskell-actions/setup@v2
         with:
           ghc-version: '9.10.3'
-          cabal-version: '3.10.2.0'
+          cabal-version: '3.14'
       - name: Cabal update
         run: cabal update
       - name: Build
