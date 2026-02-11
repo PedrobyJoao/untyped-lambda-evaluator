@@ -5,9 +5,10 @@
 - [ ] fix: gets stuck when returning beta-reductions from an evaluated with too many steps
   - show is probably too slow doing so many concatenations
 - [ ] deploy
-  - [ ] as-package/containerize
-  - [ ] VPS? deploy service?
-  - [ ] CI/CD: (build + tests) + deployment
+  - [x] as-package/containerize (decided to keep cabal build)
+  - [x] VPS? deploy service?
+  - [x] CI/CD: (build + tests) + deployment
+  - [ ] harden security
 - [ ] README docs
 - [ ] tests for functions marked with `todo: test`
 
