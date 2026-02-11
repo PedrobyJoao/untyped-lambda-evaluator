@@ -2,6 +2,8 @@
 
 ## Core
 
+- [ ] fix: gets stuck when returning beta-reductions from an evaluated with too many steps
+  - show is probably too slow doing so many concatenations
 - [ ] deploy
   - [ ] as-package/containerize
   - [ ] VPS? deploy service?
