@@ -19,9 +19,9 @@ import           Web.Scotty                    (ActionM, ScottyM, catch, file,
                                                 formParam, get, html,
                                                 middleware, post, scotty)
 
-runApp :: IO ()
-runApp =
-  scotty 3000 $ do
+runApp :: Int -> IO ()
+runApp port =
+  scotty port $ do
     middleware $ staticPolicy staticUnderPrefix
     routes
 

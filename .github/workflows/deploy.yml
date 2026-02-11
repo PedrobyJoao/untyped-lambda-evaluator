@@ -1,0 +1,109 @@
+name: Deploy
+
+on:
+  pull_request:
+    branches:
+      - release
+  push:
+    branches:
+      - release
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build_test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - id: setup
+        uses: haskell-actions/setup@v2
+        with:
+          ghc-version: '9.10.3'
+          cabal-version: '3.14'
+      - id: cache
+        name: Cache cabal
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cabal/packages
+            ~/.cabal/store
+            dist-newstyle
+          key: ${{ runner.os }}-ghc-${{ steps.setup.outputs.ghc-version }}-cabal-${{ steps.setup.outputs.cabal-version }}-${{ hashFiles('**/*.cabal', 'cabal.project', 'cabal.project.freeze') }}
+          restore-keys: |
+            ${{ runner.os }}-ghc-${{ steps.setup.outputs.ghc-version }}-cabal-${{ steps.setup.outputs.cabal-version }}-
+            ${{ runner.os }}-ghc-${{ steps.setup.outputs.ghc-version }}-
+      - name: Cabal update
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: cabal update
+      - name: Build
+        run: cabal build
+      - name: Test
+        run: cabal test
+
+  deploy:
+    needs: build_test
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/release'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - id: setup
+        uses: haskell-actions/setup@v2
+        with:
+          ghc-version: '9.10.3'
+          cabal-version: '3.14'
+      - id: cache
+        name: Cache cabal
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cabal/packages
+            ~/.cabal/store
+            dist-newstyle
+          key: ${{ runner.os }}-ghc-${{ steps.setup.outputs.ghc-version }}-cabal-${{ steps.setup.outputs.cabal-version }}-${{ hashFiles('**/*.cabal', 'cabal.project', 'cabal.project.freeze') }}
+          restore-keys: |
+            ${{ runner.os }}-ghc-${{ steps.setup.outputs.ghc-version }}-cabal-${{ steps.setup.outputs.cabal-version }}-
+            ${{ runner.os }}-ghc-${{ steps.setup.outputs.ghc-version }}-
+      - name: Cabal update
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: cabal update
+      - name: Build
+        run: cabal build
+      - name: Locate binary
+        run: echo "BIN_PATH=$(cabal list-bin lambda-calculus)" >> "$GITHUB_ENV"
+      - name: Prepare release bundle
+        run: |
+          mkdir -p dist/release
+          cp "$BIN_PATH" dist/release/lambda-calculus
+          cp -r static dist/release/static
+          tar -C dist/release -czf dist/lambda-calculus-${{ github.sha }}.tar.gz .
+      - name: Start ssh-agent
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.VPS_SSH_KEY }}
+      - name: Add VPS host key
+        run: |
+          PORT="${{ secrets.VPS_PORT }}"
+          if [ -z "$PORT" ]; then PORT=22; fi
+          mkdir -p ~/.ssh
+          ssh-keyscan -p "$PORT" -H "${{ secrets.VPS_HOST }}" >> ~/.ssh/known_hosts
+      - name: Upload release bundle
+        run: |
+          PORT="${{ secrets.VPS_PORT }}"
+          if [ -z "$PORT" ]; then PORT=22; fi
+          scp -P "$PORT" dist/lambda-calculus-${{ github.sha }}.tar.gz "${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/opt/lambda-calculus/releases/"
+      - name: Activate release
+        run: |
+          PORT="${{ secrets.VPS_PORT }}"
+          if [ -z "$PORT" ]; then PORT=22; fi
+          ssh -p "$PORT" "${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}" <<'EOF'
+            set -euo pipefail
+            release_dir="/opt/lambda-calculus/releases/${{ github.sha }}"
+            tarball="/opt/lambda-calculus/releases/lambda-calculus-${{ github.sha }}.tar.gz"
+            mkdir -p "$release_dir"
+            tar -xzf "$tarball" -C "$release_dir"
+            rm -f "$tarball"
+            ln -sfn "$release_dir" /opt/lambda-calculus/current
+            sudo systemctl restart lambda-calculus
+          EOF
