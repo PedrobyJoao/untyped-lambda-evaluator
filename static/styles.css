@@ -229,7 +229,7 @@ a:focus {
 form {
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
+  gap: 0.6rem;
 }
 
 /* Top-level checkboxes (Include Prelude, Show beta reductions) */
@@ -642,7 +642,7 @@ details > summary[role="button"] {
 
 /* --- Footer --- */
 .page-footer {
-  margin-top: 2rem;
+  margin-top: 0.1rem;
   background: transparent;
 }
 
