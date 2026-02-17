@@ -639,3 +639,36 @@ details > summary[role="button"] {
     transform: rotate(360deg);
   }
 }
+
+/* --- Footer --- */
+.page-footer {
+  margin-top: 2rem;
+  background: transparent;
+}
+
+.footer-note {
+  width: min(60rem, calc(100% - 1rem));
+  margin: 0 auto 2rem;
+  text-align: center;
+  color: rgba(28, 35, 43, 0.62);
+  font-size: 0.82rem;
+  letter-spacing: 0.01em;
+}
+
+.page-footer a {
+  color: rgba(61, 95, 122, 0.85) !important;
+  text-decoration-color: rgba(61, 95, 122, 0.4) !important;
+  font-weight: 600;
+}
+
+.page-footer a:hover,
+.page-footer a:focus {
+  color: rgba(61, 95, 122, 1) !important;
+  text-decoration-color: rgba(61, 95, 122, 0.7) !important;
+}
+
+.footer-sep {
+  display: inline-block;
+  margin: 0 0.4rem;
+  color: rgba(28, 35, 43, 0.32);
+}
