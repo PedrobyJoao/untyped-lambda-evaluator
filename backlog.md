@@ -3,26 +3,29 @@
 ## Core
 
 - [ ] fix: gets stuck when returning beta-reductions from an evaluated with too many steps
-  - show is probably too slow doing so many concatenations
+      (show is probably too slow doing so many concatenations)
+  - [ ] also maybe make trace lazy again (limit to 2^12 steps, do we need to worry about memory?)
 - [ ] deploy
   - [x] as-package/containerize (decided to keep cabal build)
   - [x] VPS? deploy service?
   - [x] CI/CD: (build + tests) + deployment
+  - [ ] faster ci (ghc installation + build)
   - [ ] harden security
-- [ ] README docs
-- [ ] tests for functions marked with `todo: test`
 
 ## Extra
 
+- [ ] CI: faster (ghc installation + build)
 - [ ] Eval: Call by value
 - [ ] Eval: Call by need
-  - [ ] UI-About: Call-byNeed
+  - [ ] UI-About: Call-by-Need
 - [ ] Optimal evaluator
   - [ ] have trace building optional
   - [ ] a better algorithm
   - [ ] might include memoization of subterms and their normal forms
-  - [ ] Concurrent eval of `App` terms in `App e1 e2`
+  - [ ] Concurrent recursion of `App` terms in `App e1 e2`
 - [ ] tests: More realistic e2e tests (with more interesting examples)
+- [ ] tests: for functions marked with `todo: test`
+- [ ] http (App.hs) tests?
 - [ ] SRI for pico/htmx urls
 - [ ] UI: use Blaze-HTML in Web.Render instead of pure strings
 - [ ] UI: run all b-red strategies and compare them
@@ -37,6 +40,7 @@
       so it's only more or less reliable if we execute the eval func in a separate process.
 - [ ] UI:statistics: number of alpha renamings
 - [ ] UI: info button for each strategy with small description for each
+- [ ] CICD: use newer GHC
 - [ ] QA: rename data type: BetaReduction -> ReductionStrategy
 
 ## Done
@@ -80,3 +84,5 @@
 - [x] e2e (parser + eval)
 - [x] UI: How to use
 - [x] UI: About
+- [x] README docs
+- [x] UI: bottom info (repo + license?)
